@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\Images\TomiFitLogoICON.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Images\TomiFitLogo.jpg" />
+    <None Remove="Resources\Images\TomiFitLogo2.jpg" />
+    <None Remove="Resources\Logos\ChipIcon.png" />
+    <None Remove="Resources\Logos\InfoIcon.png" />
+    <None Remove="Resources\Logos\LogOutIcon.png" />
+    <None Remove="Resources\Logos\MemberIcon.png" />
+    <None Remove="Resources\Logos\MembershipIcon.png" />
+    <None Remove="Resources\Logos\PushPin.png" />
+    <None Remove="Resources\Logos\TrashIcon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\Images\TomiFitLogoICON.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Images\TomiFitLogo.jpg" />
+    <Resource Include="Resources\Images\TomiFitLogo2.jpg" />
+    <Resource Include="Resources\Logos\ChipIcon.png" />
+    <Resource Include="Resources\Logos\InfoIcon.png" />
+    <Resource Include="Resources\Logos\LogOutIcon.png" />
+    <Resource Include="Resources\Logos\MemberIcon.png" />
+    <Resource Include="Resources\Logos\MembershipIcon.png" />
+    <Resource Include="Resources\Logos\PushPin.png" />
+    <Resource Include="Resources\Logos\TrashIcon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="DotNetProjects.WpfToolkit.Input" Version="6.1.94" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+</Project>

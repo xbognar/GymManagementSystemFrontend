@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="GymWPF.Views.Dialogs.ChangeChipView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:GymWPF.Views.Dialogs"
+             mc:Ignorable="d" Width="763" Height="454">
+
+    <Border Background="White" Padding="20" CornerRadius="35" Margin="-13,28,0,-18">
+        <Grid>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.5*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="0.5*" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Zmeniť majiteľa čipu" Style="{StaticResource LabelStyle}" FontSize="28" FontWeight="Bold" VerticalAlignment="Top" Margin="10,10,10,0"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Starý majiteľ:" Style="{StaticResource LabelStyle}" VerticalAlignment="Top" Margin="81,17,99,0"/>
+            <ComboBox Grid.Row="1" Grid.Column="0" Style="{StaticResource ComboBoxStyle}" Margin="45,0,63,0" ItemsSource="{Binding MemberNames}" SelectedItem="{Binding SelectedOldOwner}"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="Nový majiteľ:" Style="{StaticResource LabelStyle}" VerticalAlignment="Top" Margin="88,17,164,0"/>
+            <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ComboBoxStyle}" Margin="54,0,54,0" ItemsSource="{Binding MemberNames}" SelectedItem="{Binding SelectedNewOwner}"/>
+
+            <Button Grid.Row="2" Grid.Column="1" Content="Zrušiť" Style="{StaticResource PlainButtonStyle}" HorizontalAlignment="Left" Margin="84,28,0,28" Command="{Binding CancelCommand}"/>
+            <Button Grid.Row="2" Grid.Column="1" Content="+ Vytvoriť" Style="{StaticResource RoundButtonStyle}" HorizontalAlignment="Left" Margin="238,28,0,28" Command="{Binding ChangeChipCommand}"/>
+
+        </Grid>
+    </Border>
+</UserControl>
