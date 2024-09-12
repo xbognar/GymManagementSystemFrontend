@@ -2,6 +2,7 @@
 using GymWPF.Models;
 using GymWPF.Services.Interfaces;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -15,8 +16,6 @@ namespace GymWPF.ViewModels
 
 		public ICommand CancelCommand { get; }
 		public ICommand AddMemberCommand { get; }
-
-		#region Properties
 
 		private string _firstName;
 		public string FirstName
@@ -52,8 +51,6 @@ namespace GymWPF.ViewModels
 			get => _phoneNumber;
 			set => SetProperty(ref _phoneNumber, value);
 		}
-
-		#endregion
 
 		public AddMemberViewModel(IMemberService memberService, INavigationService navigationService)
 		{
@@ -100,13 +97,13 @@ namespace GymWPF.ViewModels
 			if (success)
 			{
 				MessageBox.Show("Member added successfully!");
+				_navigationService.CloseWindow("AddMember");
 			}
 			else
 			{
 				MessageBox.Show("Failed to add member.");
 			}
 		}
-
 
 		public void ClearData()
 		{
@@ -117,17 +114,9 @@ namespace GymWPF.ViewModels
 			PhoneNumber = string.Empty;
 		}
 
-		public void RefreshData()
-		{
-			
-		}
-
 		private void CloseWindow()
 		{
-
-			Application.Current.Windows[2].Close();
-
+			_navigationService.CloseWindow("AddMember");
 		}
-
 	}
 }

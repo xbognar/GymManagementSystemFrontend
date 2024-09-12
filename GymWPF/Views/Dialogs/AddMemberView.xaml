@@ -1,29 +1,25 @@
-﻿<UserControl x:Class="GymWPF.Views.Dialogs.AddMemberView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="clr-namespace:GymWPF.Views.Dialogs"
-             mc:Ignorable="d"
-             d:DesignHeight="450" Width="757">
-    
-    <Border Background="White" Padding="20" CornerRadius="35" Margin="0,0,-13,0">
-        <Grid>
-            
-            <Grid.ColumnDefinitions>
+﻿<Window x:Class="GymWPF.Views.Dialogs.AddMemberView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Add Member" Height="450" Width="757"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
 
+    <Border Background="White" Padding="10" CornerRadius="35">
+        <Grid>
+            <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
-              
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
-                
                 <RowDefinition Height="0.5*" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
-
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Pridať člena" Style="{StaticResource LabelStyle}" FontSize="28" FontWeight="Bold" Margin="10,14,89,10"/>
@@ -38,14 +34,13 @@
             <TextBox Grid.Row="2" Grid.Column="0" Style="{StaticResource TextBoxStyle}" Margin="50,43,48,0" VerticalAlignment="Top" Height="51" Text="{Binding PhoneNumber}"/>
 
             <TextBlock Grid.Row="3" Grid.Column="0" Text="E-mail:" Style="{StaticResource LabelStyle}" VerticalAlignment="Top" Margin="80,11,124,0" Height="22"/>
-             <TextBox Grid.Row="3" Grid.Column="0" Style="{StaticResource TextBoxStyle}" Margin="51,43,10,0" VerticalAlignment="Top" Height="51" Width="NaN" Text="{Binding Email}"/>
+            <TextBox Grid.Row="3" Grid.Column="0" Style="{StaticResource TextBoxStyle}" Margin="51,43,10,0" VerticalAlignment="Top" Height="51" Width="NaN" Text="{Binding Email}"/>
 
             <TextBlock Grid.Row="2" Grid.Column="1" Text="Dátum narodenia:" Style="{StaticResource LabelStyle}" VerticalAlignment="Top" Margin="83,12,121,0" Height="22"/>
             <DatePicker Grid.Row="2" Grid.Column="1" Style="{StaticResource DatePickerStyle}" Margin="53,43,52,0" VerticalAlignment="Top" Height="51" SelectedDate="{Binding DateOfBirth}"/>
 
-            <Button Grid.Row="3" Grid.Column="1" Content="Zrušiť"  Margin="80,68,159,8" Style="{StaticResource PlainButtonStyle}" Command="{Binding CancelCommand}"/>
-            <Button Grid.Row="3" Grid.Column="1" Content="+ Vytvoriť" Width="NaN" Height="Auto" Style="{StaticResource RoundButtonStyle}" Margin="217,68,28,10" Command="{Binding AddMemberCommand}" />
-        
+            <Button Grid.Row="3" Grid.Column="1" Content="Zrušiť"  Margin="40,50,159,8" Style="{StaticResource PlainButtonStyle}" Command="{Binding CancelCommand}"/>
+            <Button Grid.Row="3" Grid.Column="1" Content="+ Vytvoriť"  Style="{StaticResource RoundButtonStyle}" Margin="200,50,28,10" Command="{Binding AddMemberCommand}" />
         </Grid>
     </Border>
-</UserControl>
+</Window>

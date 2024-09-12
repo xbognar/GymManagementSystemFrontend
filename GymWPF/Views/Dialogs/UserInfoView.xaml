@@ -1,15 +1,16 @@
-﻿<UserControl x:Class="GymWPF.Views.Dialogs.UserInfoView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="clr-namespace:GymWPF.Views"
-             mc:Ignorable="d"
-             d:DesignHeight="730" d:DesignWidth="775">
+﻿<Window x:Class="GymWPF.Views.Dialogs.UserInfoView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Informácie o používateľovi" Height="730" Width="775"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
 
-    <Grid>
+    <Grid Background="White">
         <!-- Set the margins and padding as needed -->
-        <Grid Margin="10" Background="White" >
+        <Grid Background="White" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.2*" />
                 <RowDefinition Height="*" />
@@ -65,7 +66,7 @@
 
 
             <!-- Transactions table -->
-            <DataGrid Grid.Row="3" AutoGenerateColumns="False" Style="{StaticResource DataGridStyle}" Margin="25" ItemsSource="{Binding UserMemberships}">
+            <DataGrid Grid.Row="3" AutoGenerateColumns="False" Style="{StaticResource DataGridStyle}" Margin="25,25,25,18" ItemsSource="{Binding UserMemberships}" Grid.RowSpan="2">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Začiatok členstva" Width="*" Binding="{Binding StartDate}" />
                     <DataGridTextColumn Header="Koniec členstva" Width="*" Binding="{Binding EndDate}" />
@@ -77,4 +78,4 @@
             </DataGrid>
         </Grid>
     </Grid>
-</UserControl>
+</Window>

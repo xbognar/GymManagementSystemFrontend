@@ -16,6 +16,7 @@ namespace GymWPF.ViewModels
 	{
 		private readonly IMemberService _memberService;
 		private readonly IChipService _chipService;
+		private readonly INavigationService _navigationService;
 
 		public ICommand CancelCommand { get; }
 		public ICommand AddChipCommand { get; }
@@ -44,10 +45,11 @@ namespace GymWPF.ViewModels
 			set => SetProperty(ref _chipInfo, value);
 		}
 
-		public AddChipViewModel(IMemberService memberService, IChipService chipService)
+		public AddChipViewModel(IMemberService memberService, IChipService chipService, INavigationService navigationService)
 		{
 			_memberService = memberService;
 			_chipService = chipService;
+			_navigationService = navigationService;
 
 			CancelCommand = new RelayCommand(Cancel);
 			AddChipCommand = new AsyncRelayCommand(AddChipAsync);
@@ -58,9 +60,12 @@ namespace GymWPF.ViewModels
 		private async void LoadMembersAsync()
 		{
 			var members = await _memberService.GetAllMembersAsync();
-			foreach (var member in members)
+			if (members != null)
 			{
-				MemberNames.Add($"{member.FirstName} {member.LastName}");
+				foreach (var member in members)
+				{
+					MemberNames.Add($"{member.FirstName} {member.LastName}");
+				}
 			}
 		}
 
@@ -75,6 +80,7 @@ namespace GymWPF.ViewModels
 			var memberId = await _memberService.GetMemberIdByNameAsync(SelectedMember);
 			if (!memberId.HasValue)
 			{
+				MessageBox.Show("Selected member not found.");
 				return;
 			}
 
@@ -90,6 +96,7 @@ namespace GymWPF.ViewModels
 			if (success)
 			{
 				MessageBox.Show("Chip added successfully!");
+				_navigationService.CloseWindow("AddChip");
 			}
 			else
 			{
@@ -97,29 +104,22 @@ namespace GymWPF.ViewModels
 			}
 		}
 
-		public void ClearData()
-		{
-			SelectedMember = null;
-			SelectedIsActive = null;
-			ChipInfo = string.Empty;
-		}
-
 		public async Task RefreshData()
 		{
-			
 			MemberNames.Clear();
 			var members = await _memberService.GetAllMembersAsync();
-			foreach (var member in members)
+			if (members != null)
 			{
-				MemberNames.Add($"{member.FirstName} {member.LastName}");
+				foreach (var member in members)
+				{
+					MemberNames.Add($"{member.FirstName} {member.LastName}");
+				}
 			}
 		}
 
 		private void Cancel()
 		{
-
-			Application.Current.Windows[2].Close();
-
+			_navigationService.CloseWindow("AddChip");
 		}
 	}
 }

@@ -1,49 +1,48 @@
 ﻿using GymWPF.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Windows.Controls;
+using System.Windows;
 
-namespace GymWPF.Services
+public class NavigationService : INavigationService
 {
-	public class NavigationService : INavigationService
+	private readonly IServiceProvider _serviceProvider;
+	private readonly Dictionary<string, Type> _windowRegistry = new();
+
+	public NavigationService(IServiceProvider serviceProvider)
 	{
-		private readonly IServiceProvider _serviceProvider;
-		private readonly Dictionary<string, Type> _pagesByKey;
-		private readonly Stack<UserControl> _navigationHistory = new Stack<UserControl>();
-		private ContentControl _mainContent;
+		_serviceProvider = serviceProvider;
+	}
 
-		public NavigationService(IServiceProvider serviceProvider)
+	// Registers a window type with a key
+	public void RegisterWindow(string key, Type windowType)
+	{
+		if (!_windowRegistry.ContainsKey(key))
 		{
-			_serviceProvider = serviceProvider;
-			_pagesByKey = new Dictionary<string, Type>();
+			_windowRegistry.Add(key, windowType);
 		}
+	}
 
-		public void Configure(string key, Type pageType)
+	// Navigates to a window based on the key
+	public void NavigateTo(string key)
+	{
+		if (_windowRegistry.ContainsKey(key))
 		{
-			if (!_pagesByKey.ContainsKey(key))
-			{
-				_pagesByKey.Add(key, pageType);
-			}
+			var window = (Window)_serviceProvider.GetService(_windowRegistry[key]);
+			window?.Show();
 		}
-
-		public void NavigateTo(string pageKey)
+		else
 		{
-			if (_pagesByKey.ContainsKey(pageKey))
-			{
-				var control = _serviceProvider.GetService(_pagesByKey[pageKey]) as UserControl;
-				_navigationHistory.Push(control); 
-				_mainContent.Content = control;
-			}
-			else
-			{
-				throw new ArgumentException($"No such page: {pageKey}", nameof(pageKey));
-			}
+			throw new InvalidOperationException($"Window with key '{key}' not registered.");
 		}
+	}
 
-		public void SetMainContent(ContentControl mainContent)
+	// Closes the active window
+	public void CloseWindow(string key)
+	{
+		if (_windowRegistry.ContainsKey(key))
 		{
-			_mainContent = mainContent;
+			var window = (Window)_serviceProvider.GetService(_windowRegistry[key]);
+			window?.Close();
 		}
-
 	}
 }

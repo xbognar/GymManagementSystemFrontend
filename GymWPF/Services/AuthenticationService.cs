@@ -1,51 +1,58 @@
-﻿using GymWPF.Models;
-using GymWPF.Services.Interfaces;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using GymWPF.Models;
+using GymWPF.Services.Interfaces;
 
-namespace GymWPF.Services
+public class AuthenticationService : BaseService, IAuthenticationService
 {
-	public class AuthenticationService : BaseService, IAuthenticationService
-	{
-		public TokenResponse tokenResponse;
-		private readonly string username = "RozsaTomi";
-		private readonly string password = "TomiFit123";
+    private string _token;
+    private string _username;
+    private string _password;
+    private System.Timers.Timer _refreshTimer;
 
-		public AuthenticationService() : base() { }
+    public AuthenticationService(HttpClient httpClient) : base(httpClient) { }
 
-		public bool IsAuthenticated => tokenResponse != null && DateTime.UtcNow < tokenResponse.ExpiryDate;
+    public async Task<string> AuthenticateAsync(string username, string password)
+    {
+        _username = username;
+        _password = password;
 
-		public async Task<bool> LoginAsync()
-		{
-			var loginModel = new { username, password };
-			var response = await httpClient.PostAsJsonAsync("/api/Auth/login", loginModel);
+        var loginModel = new { Username = username, Password = password };
+        var response = await _httpClient.PostAsJsonAsync("/api/Auth/login", loginModel);
+        response.EnsureSuccessStatusCode();
 
-			if (response.IsSuccessStatusCode)
-			{
-				var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>();
-				tokenResponse.ExpiryDate = DateTime.UtcNow.AddHours(1); 
-				SetAuthorizationHeader(tokenResponse.Token);
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
+        var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>();
+        _token = tokenResponse?.Token ?? string.Empty;
+        SetAuthorizationHeader(_token);
 
-		public async Task<T> ExecuteWithAutoRefreshAsync<T>(Func<Task<T>> operation)
-		{
-			if (!IsAuthenticated)
-			{
-				if (!await LoginAsync())
-				{
-					throw new InvalidOperationException("Unable to re-authenticate.");
-				}
-			}
+        StartTokenRefreshTimer(tokenResponse?.ExpiryDate ?? DateTime.UtcNow.AddMinutes(120));
 
-			return await operation();
-		}
-	}
+        return _token;
+    }
+
+    public void SetToken(string token)
+    {
+        _token = token;
+        SetAuthorizationHeader(token);
+    }
+
+    public async Task RefreshTokenAsync()
+    {
+        if (string.IsNullOrEmpty(_username) || string.IsNullOrEmpty(_password))
+            return;
+
+        var newToken = await AuthenticateAsync(_username, _password);
+        SetToken(newToken);
+    }
+
+    private void StartTokenRefreshTimer(DateTime expiryDate)
+    {
+        var refreshInterval = expiryDate.Subtract(DateTime.UtcNow).TotalMilliseconds * 0.8; // refresh before expiry
+        _refreshTimer = new System.Timers.Timer(refreshInterval);
+        _refreshTimer.Elapsed += async (sender, e) => await RefreshTokenAsync();
+        _refreshTimer.AutoReset = false;
+        _refreshTimer.Start();
+    }
 }

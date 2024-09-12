@@ -1,13 +1,14 @@
-﻿<UserControl x:Class="GymWPF.Views.Dialogs.AddMembershipView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="clr-namespace:GymWPF.Views.Dialogs"
-             mc:Ignorable="d" Width="690" Height="520">
+﻿<Window x:Class="GymWPF.Views.Dialogs.AddMembershipView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Add Membership" Height="520" Width="690"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
 
-
-    <Border Background="White" Padding="20" CornerRadius="35">
+    <Border Background="White" Padding="10" CornerRadius="35">
         <Grid>
 
             <Grid.ColumnDefinitions>
@@ -39,9 +40,9 @@
             <TextBlock Grid.Row="3" Text="Chcete, aby bolo aktívny?" Style="{StaticResource LabelStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,14,0,0"/>
             <ComboBox Grid.Row="3" ItemsSource="{Binding IsActiveOptions}" SelectedItem="{Binding SelectedIsActive}" Grid.Column="0" Style="{StaticResource ComboBoxStyle}" Margin="32,51,33,0" VerticalAlignment="Top"/>
 
-            <Button Grid.Row="3" Grid.Column="1" Content="Zrušiť" Command="{Binding CancelCommand}" Style="{StaticResource PlainButtonStyle}" HorizontalAlignment="Right" Margin="0,68,141,24"/>
+            <Button Grid.Row="3" Grid.Column="1" Content="Zrušiť" Command="{Binding CancelCommand}" Style="{StaticResource PlainButtonStyle}" HorizontalAlignment="Right" Margin="0,69,160,24"/>
             <Button Grid.Row="3" Grid.Column="1" Content="+ Vytvoriť" Command="{Binding CreateMembershipCommand}" Style="{StaticResource RoundButtonStyle}" HorizontalAlignment="Left" Margin="189,68,0,24"/>
 
         </Grid>
     </Border>
-</UserControl>
+</Window>

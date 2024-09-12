@@ -2,10 +2,8 @@
 using CommunityToolkit.Mvvm.Input;
 using GymWPF.Models;
 using GymWPF.Services.Interfaces;
-using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace GymWPF.ViewModels
@@ -15,6 +13,7 @@ namespace GymWPF.ViewModels
 		private readonly IMemberService _memberService;
 		private readonly IMembershipService _membershipService;
 		private readonly IChipService _chipService;
+		private readonly INavigationService _navigationService;
 
 		private string _firstName;
 		public string? FirstName
@@ -60,28 +59,31 @@ namespace GymWPF.ViewModels
 
 		public ObservableCollection<UserMembershipsDTO> UserMemberships { get; } = new ObservableCollection<UserMembershipsDTO>();
 
-		public ICommand DeleteUser { get; }
+		public ICommand DeleteUserCommand { get; }
 
-
-		public UserInfoViewModel(IMemberService memberService, IMembershipService membershipService, IChipService chipService)
+		public UserInfoViewModel(IMemberService memberService, IMembershipService membershipService, IChipService chipService, INavigationService navigationService)
 		{
 			_memberService = memberService;
 			_membershipService = membershipService;
 			_chipService = chipService;
+			_navigationService = navigationService;
 
-			DeleteUser = new AsyncRelayCommand(OnDeleteUser);
-
+			DeleteUserCommand = new AsyncRelayCommand(OnDeleteUserAsync);
 		}
 
-		private async Task OnDeleteUser()
+		private async Task OnDeleteUserAsync()
 		{
-			
 			var memberID = Properties.Settings.Default.SelectedMemberId;
-			await _memberService.DeleteMemberAsync(memberID);
+			bool deleteSuccess = await _memberService.DeleteMemberAsync(memberID);
 
+			if (deleteSuccess)
+			{
+				_navigationService.CloseWindow("UserInfo");
+			}
+			
 		}
 
-		public async Task LoadUserInfo(int memberId)
+		public async Task LoadUserInfoAsync(int memberId)
 		{
 			var member = await _memberService.GetMemberByIdAsync(memberId);
 			if (member != null)
@@ -92,11 +94,10 @@ namespace GymWPF.ViewModels
 				PhoneNumber = member.PhoneNumber;
 				ChipNumber = await _chipService.GetChipInfoByMemberIdAsync(memberId);
 
-				await LoadUserMemberships(memberId);
+				await LoadUserMembershipsAsync(memberId);
 
 				MembershipCount = UserMemberships.Count;
 			}
-
 		}
 
 		public void ClearData()
@@ -110,18 +111,17 @@ namespace GymWPF.ViewModels
 			UserMemberships.Clear();
 		}
 
-		public async Task RefreshData(int memberId)
+		public async Task RefreshDataAsync(int memberId)
 		{
-			await LoadUserInfo(memberId);
+			await LoadUserInfoAsync(memberId);
 		}
 
-
-
-		private async Task LoadUserMemberships(int memberId)
+		private async Task LoadUserMembershipsAsync(int memberId)
 		{
 			var userMemberships = await _membershipService.GetUserMembershipsAsync(memberId);
 			if (userMemberships != null)
 			{
+				UserMemberships.Clear();
 				foreach (var membership in userMemberships)
 				{
 					UserMemberships.Add(membership);

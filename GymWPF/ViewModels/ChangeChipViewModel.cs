@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using GymWPF.Models;
 using GymWPF.Services.Interfaces;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -13,6 +14,7 @@ namespace GymWPF.ViewModels
 	{
 		private readonly IMemberService _memberService;
 		private readonly IChipService _chipService;
+		private readonly INavigationService _navigationService;
 
 		public ObservableCollection<string> MemberNames { get; } = new ObservableCollection<string>();
 
@@ -33,10 +35,11 @@ namespace GymWPF.ViewModels
 		public ICommand CancelCommand { get; }
 		public ICommand ChangeChipCommand { get; }
 
-		public ChangeChipViewModel(IMemberService memberService, IChipService chipService)
+		public ChangeChipViewModel(IMemberService memberService, IChipService chipService, INavigationService navigationService)
 		{
 			_memberService = memberService;
 			_chipService = chipService;
+			_navigationService = navigationService;
 
 			CancelCommand = new RelayCommand(Cancel);
 			ChangeChipCommand = new AsyncRelayCommand(UpdateChipOwnerAsync);
@@ -56,7 +59,6 @@ namespace GymWPF.ViewModels
 
 		private async Task UpdateChipOwnerAsync()
 		{
-
 			if (string.IsNullOrEmpty(SelectedOldOwner) || string.IsNullOrEmpty(SelectedNewOwner))
 			{
 				MessageBox.Show("Prosím vyberte starého a nového majiteľa čipu pred pokračovaním.", "Neplatný výber", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -64,9 +66,8 @@ namespace GymWPF.ViewModels
 			}
 
 			var oldMemberId = await _memberService.GetMemberIdByNameAsync(SelectedOldOwner);
-
 			var chips = await _chipService.GetAllChipsAsync();
-			var chipToUpdate = chips.FirstOrDefault(chip => chip.MemberID == oldMemberId.Value);
+			var chipToUpdate = chips?.FirstOrDefault(chip => chip.MemberID == oldMemberId.Value);
 			if (chipToUpdate == null)
 			{
 				MessageBox.Show("Pre vybraného starého majiteľa neboli nájdené žiadne čipy. Uistite sa, že starý majiteľ má priradené čipy.", "Žiadne čipy neboli nájdené", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -89,6 +90,7 @@ namespace GymWPF.ViewModels
 			}
 
 			MessageBox.Show("Majiteľ čipu bol úspešne aktualizovaný.", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
+			_navigationService.CloseWindow("ChangeChip");
 		}
 
 		public void ClearData()
@@ -99,7 +101,6 @@ namespace GymWPF.ViewModels
 
 		public async Task RefreshData()
 		{
-			// Clear and reload member names
 			MemberNames.Clear();
 			var members = await _memberService.GetAllMembersAsync();
 			foreach (var member in members)
@@ -111,9 +112,7 @@ namespace GymWPF.ViewModels
 
 		private void Cancel()
 		{
-
-			Application.Current.Windows[2].Close();
-
+			_navigationService.CloseWindow("ChangeChip");
 		}
 	}
 }

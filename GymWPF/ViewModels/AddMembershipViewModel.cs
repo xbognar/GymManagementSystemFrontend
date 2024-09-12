@@ -14,6 +14,7 @@ namespace GymWPF.ViewModels
 	{
 		private readonly IMemberService _memberService;
 		private readonly IMembershipService _membershipService;
+		private readonly INavigationService _navigationService;
 
 		public ObservableCollection<string> MemberNames { get; } = new ObservableCollection<string>();
 		public ObservableCollection<string> MembershipTypes { get; } = new ObservableCollection<string> { "1 mesiac", "3 mesiace", "6 mesiacov" };
@@ -26,7 +27,7 @@ namespace GymWPF.ViewModels
 			set => SetProperty(ref _selectedMember, value);
 		}
 
-		private string _selectedMembershipType = "1 mesiac"; 
+		private string _selectedMembershipType = "1 mesiac";
 		public string SelectedMembershipType
 		{
 			get => _selectedMembershipType;
@@ -57,12 +58,13 @@ namespace GymWPF.ViewModels
 		public ICommand CreateMembershipCommand { get; }
 		public ICommand CancelCommand { get; }
 
-		public AddMembershipViewModel(IMemberService memberService, IMembershipService membershipService)
+		public AddMembershipViewModel(IMemberService memberService, IMembershipService membershipService, INavigationService navigationService)
 		{
 			_memberService = memberService;
 			_membershipService = membershipService;
+			_navigationService = navigationService;
 
-			CreateMembershipCommand = new RelayCommand(CreateMembershipAsync);
+			CreateMembershipCommand = new AsyncRelayCommand(CreateMembershipAsync);
 			CancelCommand = new RelayCommand(Cancel);
 
 			LoadMembersAsync();
@@ -71,23 +73,27 @@ namespace GymWPF.ViewModels
 		private async void LoadMembersAsync()
 		{
 			var members = await _memberService.GetAllMembersAsync();
-			foreach (var member in members)
+			if (members != null)
 			{
-				MemberNames.Add($"{member.FirstName} {member.LastName}");
+				foreach (var member in members)
+				{
+					MemberNames.Add($"{member.FirstName} {member.LastName}");
+				}
 			}
 		}
 
-		private async void CreateMembershipAsync()
+		private async Task CreateMembershipAsync()
 		{
 			if (SelectedMember == null)
 			{
 				MessageBox.Show("Please select a member.");
 				return;
 			}
-			
-			var memberId = await _memberService.GetMemberIdByNameAsync(_selectedMember);
+
+			var memberId = await _memberService.GetMemberIdByNameAsync(SelectedMember);
 			if (!memberId.HasValue)
 			{
+				MessageBox.Show("Selected member not found.");
 				return;
 			}
 
@@ -100,11 +106,18 @@ namespace GymWPF.ViewModels
 				IsActive = SelectedIsActive == "Áno"
 			};
 
-			await _membershipService.AddMembershipAsync(newMembership);
+			bool success = await _membershipService.AddMembershipAsync(newMembership);
 
-			MessageBox.Show("Membership created successfully!");
+			if (success)
+			{
+				MessageBox.Show("Membership created successfully!");
+				_navigationService.CloseWindow("AddMembership");
+			}
+			else
+			{
+				MessageBox.Show("Failed to create membership.");
+			}
 		}
-
 
 		public void ClearData()
 		{
@@ -119,16 +132,18 @@ namespace GymWPF.ViewModels
 		{
 			MemberNames.Clear();
 			var members = await _memberService.GetAllMembersAsync();
-			foreach (var member in members)
+			if (members != null)
 			{
-				MemberNames.Add($"{member.FirstName} {member.LastName}");
+				foreach (var member in members)
+				{
+					MemberNames.Add($"{member.FirstName} {member.LastName}");
+				}
 			}
 		}
 
 		private void Cancel()
 		{
-			Application.Current.Windows[2].Close();
+			_navigationService.CloseWindow("AddMembership");
 		}
-
 	}
 }

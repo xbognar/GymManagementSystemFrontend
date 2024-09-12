@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GymWPF.Models
+﻿namespace GymWPF.Models
 {
-    public class ChipUpdateRequest
-    {
+	public class ChipUpdateRequest
+	{
 
 		public int ChipID { get; set; }
 
