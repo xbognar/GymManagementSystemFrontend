@@ -47,12 +47,18 @@ public class AuthenticationService : BaseService, IAuthenticationService
         SetToken(newToken);
     }
 
-    private void StartTokenRefreshTimer(DateTime expiryDate)
-    {
-        var refreshInterval = expiryDate.Subtract(DateTime.UtcNow).TotalMilliseconds * 0.8; // refresh before expiry
-        _refreshTimer = new System.Timers.Timer(refreshInterval);
-        _refreshTimer.Elapsed += async (sender, e) => await RefreshTokenAsync();
-        _refreshTimer.AutoReset = false;
-        _refreshTimer.Start();
-    }
+	private void StartTokenRefreshTimer(DateTime expiryDate)
+	{
+		var refreshInterval = expiryDate.Subtract(DateTime.UtcNow).TotalMilliseconds - TimeSpan.FromMinutes(5).TotalMilliseconds;
+		if (refreshInterval <= 0)
+		{
+			refreshInterval = TimeSpan.FromSeconds(30).TotalMilliseconds;
+		}
+
+		_refreshTimer = new System.Timers.Timer(refreshInterval);
+		_refreshTimer.Elapsed += async (sender, e) => await RefreshTokenAsync();
+		_refreshTimer.AutoReset = false;
+		_refreshTimer.Start();
+	}
+
 }

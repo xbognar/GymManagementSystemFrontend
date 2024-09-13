@@ -17,6 +17,8 @@ namespace GymWPF.ViewModels
 		private readonly IMemberService _memberService;
 		private readonly INavigationService _navigationService;
 
+		private readonly UserInfoViewModel _userInfoViewModel;
+
 		public ObservableCollection<MembershipDTO> Memberships { get; private set; }
 		public ObservableCollection<ChipDTO> Chips { get; private set; }
 		public ObservableCollection<string> MemberNames { get; } = new ObservableCollection<string>();
@@ -86,12 +88,35 @@ namespace GymWPF.ViewModels
 			}
 		}
 
-		public MainViewModel(IMembershipService membershipService, IChipService chipService, IMemberService memberService, INavigationService navigationService)
+		private string _note1;
+		public string Note1
+		{
+			get => _note1;
+			set
+			{
+				SetProperty(ref _note1, value);
+				SaveNotes(); 
+			}
+		}
+
+		private string _note2;
+		public string Note2
+		{
+			get => _note2;
+			set
+			{
+				SetProperty(ref _note2, value);
+				SaveNotes();  
+			}
+		}
+
+		public MainViewModel(IMembershipService membershipService, IChipService chipService, IMemberService memberService, INavigationService navigationService, UserInfoViewModel userInfoViewModel)
 		{
 			_membershipService = membershipService;
 			_chipService = chipService;
 			_memberService = memberService;
 			_navigationService = navigationService;
+			_userInfoViewModel = userInfoViewModel;
 
 			Memberships = new ObservableCollection<MembershipDTO>();
 			Chips = new ObservableCollection<ChipDTO>();
@@ -112,6 +137,8 @@ namespace GymWPF.ViewModels
 			ShowUserInfoViewCommand = new RelayCommand(() => _navigationService.NavigateTo("UserInfo"));
 			LogoutCommand = new RelayCommand(LogOutCommand);
 			RefreshDataCommand = new RelayCommand(RefreshData);
+
+			LoadNotes();
 
 			_ = LoadMembershipsAsync(true);
 			_ = LoadChipsAsync(true);
@@ -249,9 +276,12 @@ namespace GymWPF.ViewModels
 
 				if (selectedMember != null)
 				{
+					_userInfoViewModel.ClearData();
+					await _userInfoViewModel.LoadUserInfoAsync(selectedMember.MemberID);
 					Properties.Settings.Default.SelectedMemberId = selectedMember.MemberID;
 					Properties.Settings.Default.Save();
-					_navigationService.NavigateTo("UserInfo");
+
+					_navigationService.NavigateTo("UserInfo", _userInfoViewModel);
 				}
 				else
 				{
@@ -263,6 +293,7 @@ namespace GymWPF.ViewModels
 				MessageBox.Show($"Error finding user info: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
+
 
 		private void LogOutCommand()
 		{
@@ -298,5 +329,29 @@ namespace GymWPF.ViewModels
 				MessageBox.Show($"Error updating membership status: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
+
+		private void SaveNotes()
+		{
+			Properties.Settings.Default.Note1 = Note1;
+			Properties.Settings.Default.Note2 = Note2;
+			Properties.Settings.Default.Save();
+		}
+
+		private void LoadNotes()
+		{
+			try
+			{
+				var note1 = Properties.Settings.Default.Note1;
+				var note2 = Properties.Settings.Default.Note2;
+
+				Note1 = note1;
+				Note2 = note2;
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($"Error loading notes: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
 	}
 }

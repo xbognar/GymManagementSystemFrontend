@@ -22,7 +22,10 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Pridať člena" Style="{StaticResource LabelStyle}" FontSize="28" FontWeight="Bold" Margin="10,14,89,10"/>
+            <Border Background="#333C7A" Height="14" VerticalAlignment="Top" Grid.Row="0" CornerRadius="10,0,0,10" Margin="44,3,-10,0" Grid.Column="1" />
+            <Border Background="#E1E1FF" Height="13" VerticalAlignment="Top" Grid.Row="0" CornerRadius="10,0,0,10" Margin="170,22,-10,0" Grid.Column="1" />
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Pridať člena" Style="{StaticResource LabelStyle}" FontSize="28" FontWeight="Bold" Margin="25,14,89,10"/>
 
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Meno:" Style="{StaticResource LabelStyle}" VerticalAlignment="Top" Margin="80,29,205,0" Height="22"/>
             <TextBox Grid.Row="1" Grid.Column="0" Style="{StaticResource TextBoxStyle}" Margin="51,58,48,0" VerticalAlignment="Top" Height="51" Text="{Binding FirstName}"/>

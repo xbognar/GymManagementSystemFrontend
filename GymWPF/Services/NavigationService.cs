@@ -23,11 +23,15 @@ public class NavigationService : INavigationService
 	}
 
 	// Navigates to a window based on the key
-	public void NavigateTo(string key)
+	public void NavigateTo(string key, object viewModel = null)
 	{
 		if (_windowRegistry.ContainsKey(key))
 		{
 			var window = (Window)_serviceProvider.GetService(_windowRegistry[key]);
+			if (viewModel != null)
+			{
+				window.DataContext = viewModel;  // Set DataContext if a viewmodel is provided
+			}
 			window?.Show();
 		}
 		else
@@ -35,6 +39,7 @@ public class NavigationService : INavigationService
 			throw new InvalidOperationException($"Window with key '{key}' not registered.");
 		}
 	}
+
 
 	// Closes the active window
 	public void CloseWindow(string key)

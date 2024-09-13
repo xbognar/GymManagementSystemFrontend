@@ -7,8 +7,8 @@
         Title="Add Chip" Height="452" Width="763"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
-    
-    <Border Background="White" Padding="10" CornerRadius="35">
+
+    <Border Background="White" Padding="10">
         <Grid>
 
             <Grid.ColumnDefinitions>
@@ -22,19 +22,22 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
+            <Border Background="#333C7A" Height="14" VerticalAlignment="Top" Grid.Row="0" CornerRadius="10,0,0,10" Margin="44,3,-10,0" Grid.Column="1" />
+            <Border Background="#E1E1FF" Height="13" VerticalAlignment="Top" Grid.Row="0" CornerRadius="10,0,0,10" Margin="170,22,-10,0" Grid.Column="1" />
+
             <TextBlock Grid.Row="0" Text="Pridať chip" Style="{StaticResource LabelStyle}" FontSize="28" FontWeight="Bold" Margin="10,10,163,171" Grid.RowSpan="2"/>
 
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Informácie o chipe:" Style="{StaticResource LabelStyle}" VerticalAlignment="Top" Margin="72,29,108,0"/>
             <TextBox Grid.Row="1" Grid.Column="0" Style="{StaticResource TextBoxStyle}" Margin="50,71,52,0"  VerticalAlignment="Top" Text="{Binding ChipInfo}"/>
 
             <TextBlock Grid.Row="1" Grid.Column="1" Text="Držiteľ:" Style="{StaticResource LabelStyle}" VerticalAlignment="Top" Margin="86,29,165,0"/>
-            <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ComboBoxStyle}" VerticalAlignment="Top" Margin="54,71,54,0" ItemsSource="{Binding MemberNames}" SelectedItem="{Binding SelectedMember}"/>
+            <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ComboBoxStyle}" VerticalAlignment="Top" Margin="54,71,50,0" ItemsSource="{Binding MemberNames}" SelectedItem="{Binding SelectedMember}"/>
 
             <TextBlock Grid.Row="2" Grid.Column="0" Text="Chcete, aby bolo aktívny?" Style="{StaticResource LabelStyle}" VerticalAlignment="Top" Margin="72,31,50,0"/>
             <ComboBox Grid.Row="2" Grid.Column="0" Style="{StaticResource ComboBoxStyle}" Margin="48,69,50,0" VerticalAlignment="Top" ItemsSource="{Binding IsActiveOptions}" SelectedItem="{Binding SelectedIsActive}"/>
 
-            <Button Grid.Row="2" Grid.Column="1" Content="Zrušiť" Style="{StaticResource PlainButtonStyle}" HorizontalAlignment="Right" Margin="0,86,162,35" Command="{Binding CancelCommand}"/>
-            <Button Grid.Row="2" Grid.Column="1" Content="+ Vytvoriť" Style="{StaticResource RoundButtonStyle}" HorizontalAlignment="Left" Margin="224,86,0,35" Command="{Binding AddChipCommand}"/>
+            <Button Grid.Row="2" Grid.Column="1" Content="Zrušiť" Style="{StaticResource PlainButtonStyle}" HorizontalAlignment="Right" Margin="0,86,162,30" Command="{Binding CancelCommand}"/>
+            <Button Grid.Row="2" Grid.Column="1" Content="+ Vytvoriť" Style="{StaticResource RoundButtonStyle}" HorizontalAlignment="Left" Margin="224,86,0,30" Command="{Binding AddChipCommand}"/>
 
         </Grid>
     </Border>
