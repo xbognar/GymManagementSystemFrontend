@@ -16,6 +16,9 @@ namespace GymWPF
 
 		public App()
 		{
+			DotNetEnv.Env.Load();
+			DotNetEnv.Env.TraversePath().Load();
+
 			var serviceCollection = new ServiceCollection();
 			ConfigureServices(serviceCollection);
 			_serviceProvider = serviceCollection.BuildServiceProvider();
@@ -52,8 +55,11 @@ namespace GymWPF
 		{
 			base.OnStartup(e);
 
+			var username = System.Environment.GetEnvironmentVariable("USERNAME");
+			var password = System.Environment.GetEnvironmentVariable("PASSWORD");
+
 			var authService = _serviceProvider.GetRequiredService<IAuthenticationService>();
-			var isAuthenticated = await authService.AuthenticateAsync("RozsaTomi", "TomiFit123");
+			var isAuthenticated = await authService.AuthenticateAsync(username, password);
 
 			if (!string.IsNullOrEmpty(isAuthenticated)) 
 			{
