@@ -34,7 +34,7 @@ The Gym Management System provides an efficient and organized way to manage gym 
 
 <div align="center">
     <img src="https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/AddMemberView.png" alt="Add Member View" width="500" height="280" style="margin: 5px;"/>
-    <img src="https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/AddMembershipView.png" alt="Add Membership View" width="500" height="300" style="margin: 5px;"/>
+    <img src="https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/AddMembershipView.png" alt="Add Membership View" width="400" height="280" style="margin: 5px;"/>
 </div>
 
 ### User Information View
