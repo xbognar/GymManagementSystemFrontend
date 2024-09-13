@@ -30,17 +30,17 @@ The Gym Management System provides an efficient and organized way to manage gym 
 ### Main View
 ![Main View](https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/MainView.png)
 
-### Add Member View
-![Add Member View](https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/AddMemberView.png)
+## Add Views
 
-### Add Membership View
-![Add Membership View](https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/AddMembershipView.png)
+<div align="center">
+    <img src="https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/AddMemberView.png" alt="Add Member View" width="300" style="margin: 5px;"/>
+    <img src="https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/AddMemberView.png" alt="Add Membership View" width="300" style="margin: 5px;"/>
+</div>
 
-### Add Chip View
-![Add Chip View](https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/AddChipView.png)
-
-### Change Chip View
-![Change Chip View](https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/ChangeChipView.png)
+<div align="center">
+    <img src="https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/AddChipView.png" alt="Add Chip View" width="300" style="margin: 5px;"/>
+    <img src="https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/ChangeChipView.png" alt="Change Chip View" width="300" style="margin: 5px;"/>
+</div>
 
 ### User Information View
 ![User Info View](https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/UserInfoView.png)
