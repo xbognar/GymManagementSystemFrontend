@@ -20,7 +20,7 @@
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="1" Text="Informácie o používateľovi" Style="{StaticResource LabelStyle}" FontSize="28" FontWeight="Bold" Margin="25,21,377,18" />
-            <Button Grid.Row="1" Content="Vymazať používateľa" Command="{Binding DeleteUser}" Style="{StaticResource RoundButtonStyle}" HorizontalAlignment="Left" Margin="565,23,0,5" Width="165"/>
+            <Button Grid.Row="1" Content="Vymazať používateľa" Command="{Binding DeleteUserCommand}" Style="{StaticResource RoundButtonStyle}" HorizontalAlignment="Left" Margin="560,23,0,3" Width="165"/>
             <!-- User information section -->
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
