@@ -1,0 +1,27 @@
+﻿<Window x:Class="GymWPF.Views.Dialogs.AllUsersView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Všetci používatelia" Height="700" Width="1200"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Background="White">
+        <DataGrid ItemsSource="{Binding Users}" AutoGenerateColumns="False" Margin="20" Style="{StaticResource DataGridStyle}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding MemberID}" Width="0.3*"/>
+                <DataGridTextColumn Header="Meno" Binding="{Binding FirstName}" Width="*"/>
+                <DataGridTextColumn Header="Priezvisko" Binding="{Binding LastName}" Width="*"/>
+                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="*"/>
+                <DataGridTextColumn Header="Tel.č." Binding="{Binding PhoneNumber}" Width="*"/>
+                <DataGridTemplateColumn Header="" Width="40">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding DataContext.DeleteUserCommand, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" CommandParameter="{Binding MemberID}" Style="{StaticResource DataGridButtonStyle}">
+                                <Image Source="pack://application:,,,/Resources/Logos/TrashIcon.png" Margin="0,0,0,15" Height="15" Width="15"/>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

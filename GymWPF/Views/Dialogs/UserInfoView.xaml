@@ -9,8 +9,7 @@
         ResizeMode="NoResize">
 
     <Grid Background="White">
-        <!-- Set the margins and padding as needed -->
-        <Grid Background="White" >
+        <Grid Background="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.2*" />
                 <RowDefinition Height="*" />
@@ -19,8 +18,9 @@
                 <RowDefinition Height="0.5*" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="1" Text="Informácie o používateľovi" Style="{StaticResource LabelStyle}" FontSize="28" FontWeight="Bold" Margin="25,21,377,18" />
-            <Button Grid.Row="1" Content="Vymazať používateľa" Command="{Binding DeleteUserCommand}" Style="{StaticResource RoundButtonStyle}" HorizontalAlignment="Left" Margin="560,23,0,3" Width="165"/>
+            <!-- Title Text -->
+            <TextBlock Grid.Row="1" Text="Informácie o používateľovi" Style="{StaticResource LabelStyle}" FontSize="28" FontWeight="Bold" Margin="201,18,201,10" />
+
             <!-- User information section -->
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
@@ -29,7 +29,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- First column of user details -->
-                <StackPanel Grid.Column="0" Orientation="Vertical">
+                <StackPanel Grid.Column="0" Orientation="Vertical" Grid.ColumnSpan="2" Margin="0,0,365,0">
                     <TextBlock Style="{StaticResource LabelStyle}" Margin="50,30,0,0">
                         <Run Text="Meno :&#x9;" />
                         <Run Text="{Binding FirstName}" />
@@ -49,7 +49,7 @@
                 </StackPanel>
 
                 <!-- Second column of user details -->
-                <StackPanel Grid.Column="1" Orientation="Vertical">
+                <StackPanel Grid.Column="1" Orientation="Vertical" Margin="28,0,0,0">
                     <TextBlock Style="{StaticResource LabelStyle}" Margin="15,40,0,0" Height="60">
                         <Run Text="Počet zakúpených " />
                         <LineBreak />
@@ -60,21 +60,16 @@
                         <Run Text="Držiteľ čipu:&#x9;" />
                         <Run Text="{Binding ChipNumber}" />
                     </TextBlock>
-
                 </StackPanel>
             </Grid>
 
-
-            <!-- Transactions table -->
+            <!-- Memberships DataGrid -->
             <DataGrid Grid.Row="3" AutoGenerateColumns="False" Style="{StaticResource DataGridStyle}" Margin="25,25,25,18" ItemsSource="{Binding UserMemberships}" Grid.RowSpan="2">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Začiatok členstva" Width="*" Binding="{Binding StartDate}" />
                     <DataGridTextColumn Header="Koniec členstva" Width="*" Binding="{Binding EndDate}" />
                     <DataGridTextColumn Header="Typ členstva" Width="*" Binding="{Binding PaymentType}" />
                 </DataGrid.Columns>
-                <DataGrid.Items>
-
-                </DataGrid.Items>
             </DataGrid>
         </Grid>
     </Grid>

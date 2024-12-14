@@ -1,0 +1,25 @@
+﻿<Window x:Class="GymWPF.Views.Dialogs.LargeChipView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Veľký zoznam čipov" Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Background="White">
+        <DataGrid ItemsSource="{Binding Chips}" AutoGenerateColumns="False" Margin="20" Style="{StaticResource DataGridStyle}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding ChipID}" Width="0.3*"/>
+                <DataGridTextColumn Header="Meno držiteľa" Binding="{Binding OwnerFullName}" Width="*"/>
+                <DataGridTextColumn Header="Informácia o čipe" Binding="{Binding ChipInfo}" Width="*"/>
+                <DataGridTemplateColumn Header="" Width="40">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding DataContext.DeleteChipCommand, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" CommandParameter="{Binding ChipID}" Style="{StaticResource DataGridButtonStyle}">
+                                <Image Source="pack://application:,,,/Resources/Logos/TrashIcon.png" Margin="0,0,0,15" Height="15" Width="15"/>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

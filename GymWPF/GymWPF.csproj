@@ -13,12 +13,14 @@
     <None Remove="Resources\Images\TomiFitLogo.jpg" />
     <None Remove="Resources\Images\TomiFitLogo2.jpg" />
     <None Remove="Resources\Logos\ChipIcon.png" />
+    <None Remove="Resources\Logos\GroupIcon.png" />
     <None Remove="Resources\Logos\InfoIcon.png" />
     <None Remove="Resources\Logos\LogOutIcon.png" />
     <None Remove="Resources\Logos\MemberIcon.png" />
     <None Remove="Resources\Logos\MembershipIcon.png" />
     <None Remove="Resources\Logos\PushPin.png" />
     <None Remove="Resources\Logos\RefreshIcon.png" />
+    <None Remove="Resources\Logos\ResizeIcon.png" />
     <None Remove="Resources\Logos\SearchIcon.png" />
     <None Remove="Resources\Logos\TrashIcon.png" />
   </ItemGroup>
@@ -31,6 +33,7 @@
     <Resource Include="Resources\Images\TomiFitLogo.jpg" />
     <Resource Include="Resources\Images\TomiFitLogo2.jpg" />
     <Resource Include="Resources\Logos\ChipIcon.png" />
+    <Resource Include="Resources\Logos\GroupIcon.png" />
     <Resource Include="Resources\Logos\InfoIcon.png" />
     <Resource Include="Resources\Logos\LogOutIcon.png" />
     <Resource Include="Resources\Logos\MemberIcon.png" />
@@ -39,6 +42,7 @@
     <Resource Include="Resources\Logos\RefreshIcon.png">
       <CopyToOutputDirectory></CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\Logos\ResizeIcon.png" />
     <Resource Include="Resources\Logos\SearchIcon.png">
       <CopyToOutputDirectory></CopyToOutputDirectory>
     </Resource>

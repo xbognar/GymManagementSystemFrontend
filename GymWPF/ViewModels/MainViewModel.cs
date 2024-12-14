@@ -16,7 +16,6 @@ namespace GymWPF.ViewModels
 		private readonly IChipService _chipService;
 		private readonly IMemberService _memberService;
 		private readonly INavigationService _navigationService;
-
 		private readonly UserInfoViewModel _userInfoViewModel;
 
 		public ObservableCollection<MembershipDTO> Memberships { get; private set; }
@@ -36,6 +35,9 @@ namespace GymWPF.ViewModels
 		public ICommand DeleteMembershipCommand { get; }
 		public ICommand DeleteChipCommand { get; }
 		public ICommand RefreshDataCommand { get; }
+		public ICommand ShowLargeMembershipViewCommand { get; }
+		public ICommand ShowLargeChipViewCommand { get; }
+		public ICommand ShowAllUsersViewCommand { get; }
 
 		private string _selectedMember;
 		public string SelectedMember
@@ -45,47 +47,47 @@ namespace GymWPF.ViewModels
 		}
 
 		private bool _isActiveMemberships;
+		/// <summary>
+		/// Indicates whether active memberships are currently selected. 
+		/// No direct load is triggered here. Use LoadMembershipsCommand with "Active" parameter to load.
+		/// </summary>
 		public bool IsActiveMemberships
 		{
 			get => _isActiveMemberships;
-			set
-			{
-				SetProperty(ref _isActiveMemberships, value);
-				if (value) _ = LoadMembershipsAsync(true);
-			}
+			set => SetProperty(ref _isActiveMemberships, value);
 		}
 
 		private bool _isInactiveMemberships;
+		/// <summary>
+		/// Indicates whether inactive memberships are currently selected.
+		/// No direct load is triggered here. Use LoadMembershipsCommand with "Inactive" parameter to load.
+		/// </summary>
 		public bool IsInactiveMemberships
 		{
 			get => _isInactiveMemberships;
-			set
-			{
-				SetProperty(ref _isInactiveMemberships, value);
-				if (value) _ = LoadMembershipsAsync(false);
-			}
+			set => SetProperty(ref _isInactiveMemberships, value);
 		}
 
 		private bool _isActiveChips;
+		/// <summary>
+		/// Indicates whether active chips are currently selected.
+		/// No direct load is triggered here. Use LoadChipsCommand with "Active" parameter to load.
+		/// </summary>
 		public bool IsActiveChips
 		{
 			get => _isActiveChips;
-			set
-			{
-				SetProperty(ref _isActiveChips, value);
-				if (value) _ = LoadChipsAsync(true);
-			}
+			set => SetProperty(ref _isActiveChips, value);
 		}
 
 		private bool _isInactiveChips;
+		/// <summary>
+		/// Indicates whether inactive chips are currently selected.
+		/// No direct load is triggered here. Use LoadChipsCommand with "Inactive" parameter to load.
+		/// </summary>
 		public bool IsInactiveChips
 		{
 			get => _isInactiveChips;
-			set
-			{
-				SetProperty(ref _isInactiveChips, value);
-				if (value) _ = LoadChipsAsync(false);
-			}
+			set => SetProperty(ref _isInactiveChips, value);
 		}
 
 		private string _note1;
@@ -95,7 +97,7 @@ namespace GymWPF.ViewModels
 			set
 			{
 				SetProperty(ref _note1, value);
-				SaveNotes(); 
+				SaveNotes();
 			}
 		}
 
@@ -106,10 +108,14 @@ namespace GymWPF.ViewModels
 			set
 			{
 				SetProperty(ref _note2, value);
-				SaveNotes();  
+				SaveNotes();
 			}
 		}
 
+		/// <summary>
+		/// Initializes a new instance of MainViewModel, sets up commands and initial collections.
+		/// Does not automatically load memberships or chips. Relies on explicit commands or RefreshData for loading.
+		/// </summary>
 		public MainViewModel(IMembershipService membershipService, IChipService chipService, IMemberService memberService, INavigationService navigationService, UserInfoViewModel userInfoViewModel)
 		{
 			_membershipService = membershipService;
@@ -120,9 +126,6 @@ namespace GymWPF.ViewModels
 
 			Memberships = new ObservableCollection<MembershipDTO>();
 			Chips = new ObservableCollection<ChipDTO>();
-
-			IsActiveMemberships = true;
-			IsActiveChips = true;
 
 			LoadDataCommand = new RelayCommand(LoadData);
 			LoadMembershipsCommand = new AsyncRelayCommand<string>(param => LoadMembershipsAsync(param == "Active"));
@@ -137,130 +140,205 @@ namespace GymWPF.ViewModels
 			ShowUserInfoViewCommand = new RelayCommand(() => _navigationService.NavigateTo("UserInfo"));
 			LogoutCommand = new RelayCommand(LogOutCommand);
 			RefreshDataCommand = new RelayCommand(RefreshData);
+			ShowLargeMembershipViewCommand = new RelayCommand(ShowLargeMembershipView);
+			ShowLargeChipViewCommand = new RelayCommand(ShowLargeChipView);
+			ShowAllUsersViewCommand = new RelayCommand(ShowAllUsersView);
 
 			LoadNotes();
-
-			_ = LoadMembershipsAsync(true);
-			_ = LoadChipsAsync(true);
 			LoadData();
+
+			IsActiveMemberships = true;
+			IsActiveChips = true;
+
 		}
 
+
+		/// <summary>
+		/// Refreshes all data by updating membership and chip statuses, clearing collections, reloading member names, and reloading currently selected active/inactive data.
+		/// </summary>
 		private async void RefreshData()
 		{
-			await UpdateMembershipStatus();
+			await UpdateMembershipStatusAsync();
+			await UpdateChipStatusAsync();
 
 			Memberships.Clear();
 			Chips.Clear();
 			MemberNames.Clear();
 
 			LoadData();
-			await LoadMembershipsAsync(IsActiveChips);
-			await LoadChipsAsync(IsActiveChips);
+
+			if (IsActiveMemberships)
+				await LoadMembershipsAsync(true);
+			else if (IsInactiveMemberships)
+				await LoadMembershipsAsync(false);
+
+			if (IsActiveChips)
+				await LoadChipsAsync(true);
+			else if (IsInactiveChips)
+				await LoadChipsAsync(false);
 		}
 
+		/// <summary>
+		/// Loads memberships from the backend based on whether they are active or inactive, and populates the Memberships collection.
+		/// </summary>
+		/// <param name="isActive">If true, loads active memberships; otherwise, inactive memberships.</param>
 		private async Task LoadMembershipsAsync(bool isActive)
 		{
 			try
 			{
+				Memberships.Clear();
 				if (isActive)
 				{
 					var activeMemberships = await _membershipService.GetActiveMembershipsAsync();
-					Memberships.Clear();
-					foreach (var membership in activeMemberships) Memberships.Add(membership);
+					if (activeMemberships != null)
+					{
+						foreach (var membership in activeMemberships)
+							Memberships.Add(membership);
+					}
 				}
 				else
 				{
 					var inactiveMemberships = await _membershipService.GetInactiveMembershipsAsync();
-					Memberships.Clear();
-					foreach (var membership in inactiveMemberships) Memberships.Add(membership);
+					if (inactiveMemberships != null)
+					{
+						foreach (var membership in inactiveMemberships)
+							Memberships.Add(membership);
+					}
 				}
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show($"Error loading memberships: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show($"Chyba pri načítaní členstiev: {ex.Message}", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
+		/// <summary>
+		/// Loads chips from the backend based on whether they are active or inactive, and populates the Chips collection.
+		/// </summary>
+		/// <param name="isActive">If true, loads active chips; otherwise, inactive chips.</param>
 		private async Task LoadChipsAsync(bool isActive)
 		{
 			try
 			{
+				Chips.Clear();
 				if (isActive)
 				{
 					var activeChips = await _chipService.GetActiveChipsAsync();
-					Chips.Clear();
-					foreach (var chip in activeChips) Chips.Add(chip);
+					if (activeChips != null)
+					{
+						foreach (var chip in activeChips) Chips.Add(chip);
+					}
 				}
 				else
 				{
 					var inactiveChips = await _chipService.GetInactiveChipsAsync();
-					Chips.Clear();
-					foreach (var chip in inactiveChips) Chips.Add(chip);
+					if (inactiveChips != null)
+					{
+						foreach (var chip in inactiveChips) Chips.Add(chip);
+					}
 				}
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show($"Error loading chips: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show($"Chyba pri načítaní čipov: {ex.Message}", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
+		/// <summary>
+		/// Loads the list of member names into MemberNames collection.
+		/// Does not load memberships or chips.
+		/// </summary>
 		private async void LoadData()
 		{
 			try
 			{
 				var members = await _memberService.GetAllMembersAsync();
-				foreach (var member in members) MemberNames.Add($"{member.FirstName} {member.LastName}");
+				if (members != null)
+				{
+					foreach (var member in members) MemberNames.Add($"{member.FirstName} {member.LastName}");
+				}
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show($"Error loading data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show($"Chyba pri načítaní dát: {ex.Message}", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
+		/// <summary>
+		/// Deletes a membership after user confirmation and refreshes the memberships list.
+		/// </summary>
+		/// <param name="membershipID">The ID of the membership to delete.</param>
 		private async Task DeleteMembershipRow(object membershipID)
 		{
 			try
 			{
-				if (membershipID != null && membershipID is int id)
+				if (membershipID is int id)
 				{
-					bool isDeleted = await _membershipService.DeleteMembershipAsync(id);
-					if (isDeleted) await LoadMembershipsAsync(IsActiveMemberships);
+					var result = MessageBox.Show("Ste si istý, že chcete odstrániť toto členstvo?", "Potvrdenie", MessageBoxButton.YesNo, MessageBoxImage.Question);
+					if (result == MessageBoxResult.Yes)
+					{
+						bool isDeleted = await _membershipService.DeleteMembershipAsync(id);
+						if (isDeleted)
+						{
+							if (IsActiveMemberships)
+								await LoadMembershipsAsync(true);
+							else if (IsInactiveMemberships)
+								await LoadMembershipsAsync(false);
+						}
+					}
 				}
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show($"Error deleting membership: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show($"Chyba pri mazaní členstva: {ex.Message}", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
+		/// <summary>
+		/// Deletes a chip after user confirmation and refreshes the chips list.
+		/// </summary>
+		/// <param name="chipID">The ID of the chip to delete.</param>
 		private async Task DeleteChipRow(object chipID)
 		{
 			try
 			{
-				if (chipID != null && chipID is int id)
+				if (chipID is int id)
 				{
-					bool isDeleted = await _chipService.DeleteChipAsync(id);
-					if (isDeleted) await LoadChipsAsync(IsActiveChips);
+					var result = MessageBox.Show("Ste si istý, že chcete odstrániť tento čip?", "Potvrdenie", MessageBoxButton.YesNo, MessageBoxImage.Question);
+					if (result == MessageBoxResult.Yes)
+					{
+						bool isDeleted = await _chipService.DeleteChipAsync(id);
+						if (isDeleted)
+						{
+							if (IsActiveChips)
+								await LoadChipsAsync(true);
+							else if (IsInactiveChips)
+								await LoadChipsAsync(false);
+						}
+					}
 				}
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show($"Error deleting chip: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show($"Chyba pri mazaní čipu: {ex.Message}", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
+		/// <summary>
+		/// Finds user info based on the currently selected member name. Opens the user info window if the member is found.
+		/// </summary>
 		private async void FindUserInfoDialog()
 		{
 			if (string.IsNullOrWhiteSpace(SelectedMember))
 			{
-				MessageBox.Show("Please select a member.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show("Prosím vyberte člena.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 				return;
 			}
 
 			var names = SelectedMember.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 			if (names.Length < 2)
 			{
-				MessageBox.Show("Please select a full name.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show("Prosím vyberte celé meno.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 				return;
 			}
 
@@ -270,7 +348,7 @@ namespace GymWPF.ViewModels
 			try
 			{
 				var allMembers = await _memberService.GetAllMembersAsync();
-				var selectedMember = allMembers.FirstOrDefault(member =>
+				var selectedMember = allMembers?.FirstOrDefault(member =>
 					string.Equals(member.FirstName, firstName, StringComparison.OrdinalIgnoreCase) &&
 					string.Equals(member.LastName, lastName, StringComparison.OrdinalIgnoreCase));
 
@@ -285,40 +363,76 @@ namespace GymWPF.ViewModels
 				}
 				else
 				{
-					MessageBox.Show("Member not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+					MessageBox.Show("Člen nebol nájdený.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show($"Error finding user info: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show($"Chyba pri hľadaní informácií o používateľovi: {ex.Message}", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
-
+		/// <summary>
+		/// Logs out the user by shutting down the application.
+		/// </summary>
 		private void LogOutCommand()
 		{
 			Application.Current.Shutdown();
 		}
 
-		private async Task UpdateMembershipStatus()
+		/// <summary>
+		/// Updates membership statuses, marking memberships as inactive if their EndDate has passed.
+		/// </summary>
+		private async Task UpdateMembershipStatusAsync()
 		{
 			try
 			{
-				var activeMemberships = await _membershipService.GetActiveMembershipsAsync();
-				foreach (var mem in activeMemberships)
+				var allMemberships = await _membershipService.GetAllMembershipsAsync();
+				if (allMemberships != null)
 				{
-					if (mem.EndDate < DateTime.Now)
+					foreach (var mem in allMemberships)
 					{
-						int? memberId = await _memberService.GetMemberIdByNameAsync(mem.MemberName);
-						if (memberId.HasValue)
+						if (mem.IsActive && mem.EndDate < DateTime.Now)
 						{
-							var membershipToUpdate = (await _membershipService.GetAllMembershipsAsync())
-								.FirstOrDefault(m => m.MemberID == memberId && m.PaymentType == mem.Type);
+							mem.IsActive = false;
+							await _membershipService.UpdateMembershipAsync(mem.MembershipID, mem);
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($"Chyba pri aktualizácii stavu členstiev: {ex.Message}", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
 
-							if (membershipToUpdate != null)
+		/// <summary>
+		/// Updates chip statuses, marking chips as inactive if their owners have no active memberships.
+		/// </summary>
+		private async Task UpdateChipStatusAsync()
+		{
+			try
+			{
+				var allChips = await _chipService.GetAllChipsAsync();
+				if (allChips != null)
+				{
+					foreach (var chip in allChips)
+					{
+						if (chip.IsActive)
+						{
+							var userMemberships = await _membershipService.GetUserMembershipsAsync(chip.MemberID);
+							bool hasActiveMembership = userMemberships != null && userMemberships.Any(m => m.EndDate > DateTime.Now);
+
+							if (!hasActiveMembership)
 							{
-								membershipToUpdate.IsActive = false;
-								await _membershipService.UpdateMembershipAsync(membershipToUpdate.MembershipID, membershipToUpdate);
+								var updateRequest = new ChipUpdateRequest
+								{
+									ChipID = chip.ChipID,
+									NewMemberID = chip.MemberID,
+									IsActive = false
+								};
+
+								await _chipService.UpdateChipAsync(chip.ChipID, updateRequest);
 							}
 						}
 					}
@@ -326,10 +440,35 @@ namespace GymWPF.ViewModels
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show($"Error updating membership status: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show($"Chyba pri aktualizácii stavu čipov: {ex.Message}", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
+		private void ShowLargeMembershipView()
+		{
+			bool isActive = IsActiveMemberships || (!IsActiveMemberships && !IsInactiveMemberships);
+			var vm = new LargeMembershipViewModel(_membershipService, isActive);
+			_navigationService.NavigateTo("LargeMembership", vm);
+		}
+
+		private void ShowLargeChipView()
+		{
+			bool isActive = IsActiveChips || (!IsActiveChips && !IsInactiveChips);
+			var vm = new LargeChipViewModel(_chipService, isActive);
+			_navigationService.NavigateTo("LargeChip", vm);
+		}
+
+		private void ShowAllUsersView()
+		{
+			// Create the ViewModel manually
+			var vm = new AllUsersViewModel(_memberService);
+			// Navigate to the "AllUsers" window and pass the ViewModel
+			_navigationService.NavigateTo("AllUsers", vm);
+		}
+
+		/// <summary>
+		/// Saves the current notes (Note1 and Note2) to application settings.
+		/// </summary>
 		private void SaveNotes()
 		{
 			Properties.Settings.Default.Note1 = Note1;
@@ -337,6 +476,9 @@ namespace GymWPF.ViewModels
 			Properties.Settings.Default.Save();
 		}
 
+		/// <summary>
+		/// Loads notes (Note1 and Note2) from application settings.
+		/// </summary>
 		private void LoadNotes()
 		{
 			try
@@ -349,9 +491,8 @@ namespace GymWPF.ViewModels
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show($"Error loading notes: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show($"Chyba pri načítaní poznámok: {ex.Message}", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
-
 	}
 }

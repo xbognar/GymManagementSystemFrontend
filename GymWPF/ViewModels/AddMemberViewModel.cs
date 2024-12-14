@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using GymWPF.Models;
 using GymWPF.Services.Interfaces;
 using System;
@@ -65,13 +66,13 @@ namespace GymWPF.ViewModels
 		{
 			if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName))
 			{
-				MessageBox.Show("Please provide both first name and last name without spaces.");
+				MessageBox.Show("Prosím, zadajte meno aj priezvisko bez medzier.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Warning);
 				return;
 			}
 
 			if (FirstName.Contains(" ") || LastName.Contains(" "))
 			{
-				MessageBox.Show("First name and last name cannot contain spaces.");
+				MessageBox.Show("Meno a priezvisko nesmú obsahovať medzery.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Warning);
 				return;
 			}
 
@@ -79,7 +80,7 @@ namespace GymWPF.ViewModels
 
 			if (existingMembers != null && existingMembers.Any(m => m.FirstName == FirstName && m.LastName == LastName))
 			{
-				MessageBox.Show("A member with the same first and last name already exists.");
+				MessageBox.Show("Člen s rovnakým menom a priezviskom už existuje.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Warning);
 				return;
 			}
 
@@ -96,12 +97,12 @@ namespace GymWPF.ViewModels
 
 			if (success)
 			{
-				MessageBox.Show("Member added successfully!");
-				_navigationService.CloseWindow("AddMember");
+				MessageBox.Show("Člen bol úspešne pridaný!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
+				ClearData();
 			}
 			else
 			{
-				MessageBox.Show("Failed to add member.");
+				MessageBox.Show("Nepodarilo sa pridať člena.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 

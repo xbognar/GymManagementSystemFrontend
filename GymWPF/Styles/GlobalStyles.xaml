@@ -74,11 +74,6 @@
         <Setter Property="Width" Value="260"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="Effect">
-            <Setter.Value>
-                <DropShadowEffect Color="#333C7A" Opacity="0.5" BlurRadius="8" Direction="220" ShadowDepth="5"/>
-            </Setter.Value>
-        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
@@ -97,6 +92,7 @@
                               VerticalAlignment="Center" 
                               Data="M 0 0 L 4 4 L 8 0 Z"/>
                         </ToggleButton>
+
                         <ContentPresenter Name="ContentSite" 
                                       IsHitTestVisible="False" 
                                       Content="{TemplateBinding SelectionBoxItem}" 
@@ -115,11 +111,13 @@
                             <Grid Name="DropDown" 
                               SnapsToDevicePixels="True" 
                               MinWidth="{TemplateBinding ActualWidth}" 
-                              MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                              MaxHeight="200">
                                 <Border x:Name="DropDownBorder" 
                                     Background="White" 
-                                    CornerRadius="20">
-                                    <ScrollViewer>
+                                    CornerRadius="0"
+                                    BorderBrush="#FFC0C0C0"
+                                    BorderThickness="2">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
                                         <ItemsPresenter/>
                                     </ScrollViewer>
                                 </Border>

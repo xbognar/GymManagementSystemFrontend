@@ -16,9 +16,15 @@ namespace GymWPF.ViewModels
 		private readonly IChipService _chipService;
 		private readonly INavigationService _navigationService;
 
+		/// <summary>
+		/// Contains the names of all members, used for selecting old and new chip owners.
+		/// </summary>
 		public ObservableCollection<string> MemberNames { get; } = new ObservableCollection<string>();
 
 		private string _selectedOldOwner;
+		/// <summary>
+		/// The currently selected old owner of the chip.
+		/// </summary>
 		public string? SelectedOldOwner
 		{
 			get => _selectedOldOwner;
@@ -26,15 +32,28 @@ namespace GymWPF.ViewModels
 		}
 
 		private string _selectedNewOwner;
+		/// <summary>
+		/// The currently selected new owner of the chip.
+		/// </summary>
 		public string? SelectedNewOwner
 		{
 			get => _selectedNewOwner;
 			set => SetProperty(ref _selectedNewOwner, value);
 		}
 
+		/// <summary>
+		/// Command to cancel the chip owner change and close the window.
+		/// </summary>
 		public ICommand CancelCommand { get; }
+
+		/// <summary>
+		/// Command to change the chip owner based on the selected old and new owners.
+		/// </summary>
 		public ICommand ChangeChipCommand { get; }
 
+		/// <summary>
+		/// Initializes a new instance of the ChangeChipViewModel, loads all members, and sets up commands.
+		/// </summary>
 		public ChangeChipViewModel(IMemberService memberService, IChipService chipService, INavigationService navigationService)
 		{
 			_memberService = memberService;
@@ -47,16 +66,27 @@ namespace GymWPF.ViewModels
 			LoadAllMembersAsync();
 		}
 
+		/// <summary>
+		/// Asynchronously loads all members and populates the MemberNames collection.
+		/// </summary>
 		private async void LoadAllMembersAsync()
 		{
 			var members = await _memberService.GetAllMembersAsync();
-			foreach (var member in members)
+			if (members != null)
 			{
-				var fullName = $"{member.FirstName} {member.LastName}";
-				MemberNames?.Add(fullName);
+				foreach (var member in members)
+				{
+					var fullName = $"{member.FirstName} {member.LastName}";
+					MemberNames?.Add(fullName);
+				}
 			}
 		}
 
+		/// <summary>
+		/// Asynchronously updates the chip owner from the old owner to the new owner.
+		/// Validates inputs, finds the chip, and updates it using the ChipService.
+		/// Shows message boxes in Slovak and clears fields after a successful update.
+		/// </summary>
 		private async Task UpdateChipOwnerAsync()
 		{
 			if (string.IsNullOrEmpty(SelectedOldOwner) || string.IsNullOrEmpty(SelectedNewOwner))
@@ -66,6 +96,12 @@ namespace GymWPF.ViewModels
 			}
 
 			var oldMemberId = await _memberService.GetMemberIdByNameAsync(SelectedOldOwner);
+			if (!oldMemberId.HasValue)
+			{
+				MessageBox.Show("Starý majiteľ nebol nájdený. Uistite sa, že ste vybrali platného člena.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Warning);
+				return;
+			}
+
 			var chips = await _chipService.GetAllChipsAsync();
 			var chipToUpdate = chips?.FirstOrDefault(chip => chip.MemberID == oldMemberId.Value);
 			if (chipToUpdate == null)
@@ -75,6 +111,11 @@ namespace GymWPF.ViewModels
 			}
 
 			var newMemberId = await _memberService.GetMemberIdByNameAsync(SelectedNewOwner);
+			if (!newMemberId.HasValue)
+			{
+				MessageBox.Show("Nový majiteľ nebol nájdený. Uistite sa, že ste vybrali platného člena.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Warning);
+				return;
+			}
 
 			var updateRequest = new ChipUpdateRequest
 			{
@@ -90,26 +131,40 @@ namespace GymWPF.ViewModels
 			}
 
 			MessageBox.Show("Majiteľ čipu bol úspešne aktualizovaný.", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
-			_navigationService.CloseWindow("ChangeChip");
+
+			// Clear the fields after successful update
+			ClearData();
 		}
 
+		/// <summary>
+		/// Clears the SelectedOldOwner and SelectedNewOwner fields.
+		/// </summary>
 		public void ClearData()
 		{
 			SelectedOldOwner = null;
 			SelectedNewOwner = null;
 		}
 
+		/// <summary>
+		/// Asynchronously refreshes member data and repopulates the MemberNames collection.
+		/// </summary>
 		public async Task RefreshData()
 		{
 			MemberNames.Clear();
 			var members = await _memberService.GetAllMembersAsync();
-			foreach (var member in members)
+			if (members != null)
 			{
-				var fullName = $"{member.FirstName} {member.LastName}";
-				MemberNames?.Add(fullName);
+				foreach (var member in members)
+				{
+					var fullName = $"{member.FirstName} {member.LastName}";
+					MemberNames?.Add(fullName);
+				}
 			}
 		}
 
+		/// <summary>
+		/// Cancels the chip owner change and closes the window.
+		/// </summary>
 		private void Cancel()
 		{
 			_navigationService.CloseWindow("ChangeChip");

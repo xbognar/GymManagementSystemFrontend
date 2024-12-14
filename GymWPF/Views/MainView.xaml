@@ -42,7 +42,7 @@
                 <TextBlock Grid.Row="1" Text="Tomáš Rózsa" Style="{StaticResource LabelStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="14" Margin="0,191,0,0" FontFamily="Segoe UI Variable Small" Height="18" Width="83" Foreground="#FF131C5C"/>
 
                 <!-- Navigation Buttons -->
-                <StackPanel Grid.Row="2" Margin="34,31,20,10">
+                <StackPanel Grid.Row="2" Margin="30,15,15,15">
                     <Button Command="{Binding ShowUserInfoViewCommand}" Style="{StaticResource SidebarButtonStyle}" Height="40">
                         <StackPanel Orientation="Horizontal">
                             <Image Source="pack://application:,,,/Resources/Logos/InfoIcon.png" Width="14" Height="14"/>
@@ -73,10 +73,16 @@
                             <TextBlock Text="  Upraviť čip" Margin="0,0,0,1" FontWeight="Normal" />
                         </StackPanel>
                     </Button>
+                    <Button Command="{Binding ShowAllUsersViewCommand}" Style="{StaticResource SidebarButtonStyle}" Height="40">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="pack://application:,,,/Resources/Logos/GroupIcon.png" Width="14" Height="14"/>
+                            <TextBlock Text="  Všetky používatelia" Margin="0,0,0,1" FontWeight="Normal" />
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
 
                 <!-- Logout Button -->
-                <Button Command="{Binding LogoutCommand}" Grid.Row="4" Style="{StaticResource SidebarButtonStyle}" Margin="34,0,44,0">
+                <Button Command="{Binding LogoutCommand}" Grid.Row="4" Style="{StaticResource SidebarButtonStyle}" Margin="34,0,44,10">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="pack://application:,,,/Resources/Logos/LogOutIcon.png" Width="14" Height="14"/>
                         <TextBlock Text=" Odhlásiť sa" Margin="0,0,0,1" FontWeight="Normal" />
@@ -114,13 +120,19 @@
                 </Grid>
 
                 <!-- Memberships filter -->
-                <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Left" Margin="10,0,0,0">
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" Margin="10,0,0,10">
                     <StackPanel Orientation="Horizontal">
                         <RadioButton Content="Active" IsChecked="{Binding IsActiveMemberships, Mode=TwoWay}" Style="{StaticResource ToggleRadioButtonStyle}" GroupName="MembershipStatus" Command="{Binding LoadMembershipsCommand}" CommandParameter="Active"/>
                         <RadioButton Content="Inactive" IsChecked="{Binding IsInactiveMemberships, Mode=TwoWay}" Style="{StaticResource ToggleRadioButtonStyle}" GroupName="MembershipStatus" Command="{Binding LoadMembershipsCommand}" CommandParameter="Inactive"/>
                     </StackPanel>
+
+                    <!-- Add the double arrow button here -->
+                    <Button Command="{Binding ShowLargeMembershipViewCommand}" Style="{StaticResource PlainButtonStyle}" Margin="775,0,0,0" Width="33" Height="33">
+                        <Image Source="pack://application:,,,/Resources/Logos/ResizeIcon.png" Width="17" Height="17"/>
+                    </Button>
                 </StackPanel>
-                <Border Grid.Row="1" Background="#D3D3D3" Margin="0,41,27,3"/>
+                <Border Grid.Row="1" Background="#D3D3D3" Margin="0,41,70,3"/>
+
 
                 <!-- Main DataGrid for Memberships -->
                 <Grid Grid.Row="2" Background="White" Margin="10">
@@ -155,23 +167,29 @@
                 </Grid>
 
                 <!-- Chip Status Filter -->
-                <StackPanel Grid.Row="3" Orientation="Vertical" HorizontalAlignment="Left" Margin="10,0,0,0">
+                <StackPanel Grid.Row="3" Orientation="Vertical" HorizontalAlignment="Left" Margin="10,10,0,0">
                     <StackPanel Orientation="Horizontal">
                         <RadioButton Content="Active" Style="{StaticResource ToggleRadioButtonStyle}" GroupName="ChipStatus" IsChecked="{Binding IsActiveChips, Mode=TwoWay}" Command="{Binding LoadChipsCommand}" CommandParameter="Active"/>
                         <RadioButton Content="Inactive" Style="{StaticResource ToggleRadioButtonStyle}" GroupName="ChipStatus" IsChecked="{Binding IsInactiveChips, Mode=TwoWay}" Command="{Binding LoadChipsCommand}" CommandParameter="Inactive"/>
+
+                        <!-- Add the double arrow button here for chips -->
+                        <Button Command="{Binding ShowLargeChipViewCommand}" Style="{StaticResource PlainButtonStyle}" Margin="440,0,0,0" Width="33" Height="33">
+                            <Image Source="pack://application:,,,/Resources/Logos/ResizeIcon.png" Width="17" Height="17"/>
+                        </Button>
                     </StackPanel>
                 </StackPanel>
 
-                <Border Grid.Row="3" Background="#D3D3D3" Margin="0,41,381,3"/>
+                <Border Grid.Row="4" Background="#D3D3D3" Margin="0,0,410,242"/>
 
                 <!-- Chips DataGrid and Notes -->
                 <Grid Grid.Row="4">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="86*"/>
+                        <ColumnDefinition Width="603*"/>
+                        <ColumnDefinition Width="344*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Grid Grid.Column="0" Margin="10,10,10,10" Background="White">
+                    <Grid Grid.Column="0" Margin="10,10,10,10" Background="White" Grid.ColumnSpan="2">
                         <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding Chips}" Style="{StaticResource DataGridStyle}" Margin="10,10,10,10">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="ID" Binding="{Binding ChipID}" Width="0.3*"/>
@@ -191,7 +209,7 @@
                     </Grid>
 
                     <!-- Notes -->
-                    <Grid Grid.Column="1" Margin="23,0,141,5">
+                    <Grid Grid.Column="2" Margin="23,0,141,5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="23*"/>
                             <RowDefinition Height="228*"/>
@@ -200,7 +218,7 @@
                         <Image Source="pack://application:,,,/Resources/Logos/PushPin.png" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,57,0,0" Width="29" Height="27" Grid.Row="1"/>
                     </Grid>
 
-                    <Grid Grid.Column="1" Grid.Row="4" Margin="156,154,23,0" VerticalAlignment="Top">
+                    <Grid Grid.Column="2" Margin="156,154,23,0" VerticalAlignment="Top">
                         <TextBox Text="{Binding Note1, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource NoteStyleWhite}" Height="150" Margin="10,-155,-11,107"/>
                         <Image Source="pack://application:,,,/Resources/Logos/PushPin.png" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-163,50,0" Width="30" Height="26"/>
                     </Grid>

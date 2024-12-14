@@ -3,12 +3,10 @@ using CommunityToolkit.Mvvm.Input;
 using GymWPF.Models;
 using GymWPF.Services.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using System.Linq;
-using System.Windows;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 
 namespace GymWPF.ViewModels
 {
@@ -22,17 +20,17 @@ namespace GymWPF.ViewModels
 		public ICommand AddChipCommand { get; }
 
 		public ObservableCollection<string> MemberNames { get; } = new ObservableCollection<string>();
-		public List<string> IsActiveOptions { get; } = new List<string> { "Áno", "Nie" };
+		public System.Collections.Generic.List<string> IsActiveOptions { get; } = new System.Collections.Generic.List<string> { "Áno", "Nie" };
 
 		private string _selectedMember;
-		public string? SelectedMember
+		public string SelectedMember
 		{
 			get => _selectedMember;
 			set => SetProperty(ref _selectedMember, value);
 		}
 
-		private string _selectedIsActive;
-		public string? SelectedIsActive
+		private string _selectedIsActive = "Áno";
+		public string SelectedIsActive
 		{
 			get => _selectedIsActive;
 			set => SetProperty(ref _selectedIsActive, value);
@@ -71,16 +69,16 @@ namespace GymWPF.ViewModels
 
 		private async Task AddChipAsync()
 		{
-			if (SelectedMember == null || string.IsNullOrWhiteSpace(ChipInfo))
+			if (string.IsNullOrWhiteSpace(SelectedMember) || string.IsNullOrWhiteSpace(ChipInfo))
 			{
-				MessageBox.Show("Please select a member and enter chip information.");
+				MessageBox.Show("Prosím vyberte člena a zadajte informácie o čipe.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Warning);
 				return;
 			}
 
 			var memberId = await _memberService.GetMemberIdByNameAsync(SelectedMember);
 			if (!memberId.HasValue)
 			{
-				MessageBox.Show("Selected member not found.");
+				MessageBox.Show("Zvolený člen nebol nájdený.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Warning);
 				return;
 			}
 
@@ -95,12 +93,12 @@ namespace GymWPF.ViewModels
 
 			if (success)
 			{
-				MessageBox.Show("Chip added successfully!");
-				_navigationService.CloseWindow("AddChip");
+				MessageBox.Show("Čip bol úspešne pridaný!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
+				ClearData();
 			}
 			else
 			{
-				MessageBox.Show("Failed to add chip.");
+				MessageBox.Show("Nepodarilo sa pridať čip.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
@@ -120,6 +118,13 @@ namespace GymWPF.ViewModels
 		private void Cancel()
 		{
 			_navigationService.CloseWindow("AddChip");
+		}
+
+		private void ClearData()
+		{
+			SelectedMember = null;
+			ChipInfo = string.Empty;
+			SelectedIsActive = "Áno";
 		}
 	}
 }

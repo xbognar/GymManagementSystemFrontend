@@ -47,6 +47,9 @@ namespace GymWPF
 			services.AddTransient<AddChipView>();
 			services.AddTransient<ChangeChipView>();
 			services.AddTransient<UserInfoView>();
+			services.AddTransient<LargeMembershipView>();
+			services.AddTransient<LargeChipView>();
+			services.AddTransient<AllUsersView>();
 
 			services.AddSingleton<INavigationService, NavigationService>();
 		}
@@ -55,13 +58,13 @@ namespace GymWPF
 		{
 			base.OnStartup(e);
 
-			var username = System.Environment.GetEnvironmentVariable("USERNAME");
-			var password = System.Environment.GetEnvironmentVariable("PASSWORD");
+			var username = Environment.GetEnvironmentVariable("USERNAME");
+			var password = Environment.GetEnvironmentVariable("PASSWORD");
 
 			var authService = _serviceProvider.GetRequiredService<IAuthenticationService>();
 			var isAuthenticated = await authService.AuthenticateAsync(username, password);
 
-			if (!string.IsNullOrEmpty(isAuthenticated)) 
+			if (!string.IsNullOrEmpty(isAuthenticated))
 			{
 				var navigationService = _serviceProvider.GetRequiredService<INavigationService>();
 
@@ -71,12 +74,22 @@ namespace GymWPF
 				navigationService.RegisterWindow("AddChip", typeof(AddChipView));
 				navigationService.RegisterWindow("ChangeChip", typeof(ChangeChipView));
 				navigationService.RegisterWindow("UserInfo", typeof(UserInfoView));
+				navigationService.RegisterWindow("LargeMembership", typeof(LargeMembershipView));
+				navigationService.RegisterWindow("LargeChip", typeof(LargeChipView));
+				navigationService.RegisterWindow("AllUsers", typeof(AllUsersView));
+
 
 				navigationService.NavigateTo("Main");
+
+				var mainView = Application.Current.Windows.OfType<MainView>().FirstOrDefault();
+				if (mainView?.DataContext is MainViewModel mainViewModel)
+				{
+					mainViewModel.RefreshDataCommand.Execute(null);
+				}
 			}
 			else
 			{
-				MessageBox.Show("Failed to authenticate. The application will now exit.");
+				MessageBox.Show("Nepodarilo sa autentifikovať. Aplikácia sa teraz ukončí.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 				Shutdown();
 			}
 		}

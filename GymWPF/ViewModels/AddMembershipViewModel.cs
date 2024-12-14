@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using GymWPF.Models;
 using GymWPF.Services.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,7 +22,7 @@ namespace GymWPF.ViewModels
 		public List<string> IsActiveOptions { get; } = new List<string> { "Áno", "Nie" };
 
 		private string _selectedMember;
-		public string? SelectedMember
+		public string SelectedMember
 		{
 			get => _selectedMember;
 			set => SetProperty(ref _selectedMember, value);
@@ -31,11 +32,17 @@ namespace GymWPF.ViewModels
 		public string SelectedMembershipType
 		{
 			get => _selectedMembershipType;
-			set => SetProperty(ref _selectedMembershipType, value);
+			set
+			{
+				if (SetProperty(ref _selectedMembershipType, value))
+				{
+					UpdateEndDateAutomatically();
+				}
+			}
 		}
 
-		private string _selectedIsActive;
-		public string? SelectedIsActive
+		private string _selectedIsActive = "Áno";
+		public string SelectedIsActive
 		{
 			get => _selectedIsActive;
 			set => SetProperty(ref _selectedIsActive, value);
@@ -45,7 +52,13 @@ namespace GymWPF.ViewModels
 		public DateTime StartDate
 		{
 			get => _startDate;
-			set => SetProperty(ref _startDate, value);
+			set
+			{
+				if (SetProperty(ref _startDate, value))
+				{
+					UpdateEndDateAutomatically();
+				}
+			}
 		}
 
 		private DateTime _endDate = DateTime.Now;
@@ -68,6 +81,8 @@ namespace GymWPF.ViewModels
 			CancelCommand = new RelayCommand(Cancel);
 
 			LoadMembersAsync();
+			SelectedIsActive = "Áno";
+			UpdateEndDateAutomatically();
 		}
 
 		private async void LoadMembersAsync()
@@ -82,18 +97,27 @@ namespace GymWPF.ViewModels
 			}
 		}
 
+		private void UpdateEndDateAutomatically()
+		{
+			int monthsToAdd = 1;
+			if (SelectedMembershipType == "3 mesiace") monthsToAdd = 3;
+			else if (SelectedMembershipType == "6 mesiacov") monthsToAdd = 6;
+
+			EndDate = StartDate.AddMonths(monthsToAdd);
+		}
+
 		private async Task CreateMembershipAsync()
 		{
 			if (SelectedMember == null)
 			{
-				MessageBox.Show("Please select a member.");
+				MessageBox.Show("Prosím vyberte člena.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Warning);
 				return;
 			}
 
 			var memberId = await _memberService.GetMemberIdByNameAsync(SelectedMember);
 			if (!memberId.HasValue)
 			{
-				MessageBox.Show("Selected member not found.");
+				MessageBox.Show("Zvolený člen nebol nájdený.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Warning);
 				return;
 			}
 
@@ -110,12 +134,12 @@ namespace GymWPF.ViewModels
 
 			if (success)
 			{
-				MessageBox.Show("Membership created successfully!");
-				_navigationService.CloseWindow("AddMembership");
+				MessageBox.Show("Členstvo bolo úspešne vytvorené!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
+				ClearData();
 			}
 			else
 			{
-				MessageBox.Show("Failed to create membership.");
+				MessageBox.Show("Nepodarilo sa vytvoriť členstvo.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
@@ -123,9 +147,9 @@ namespace GymWPF.ViewModels
 		{
 			SelectedMember = null;
 			SelectedMembershipType = "1 mesiac";
-			SelectedIsActive = null;
+			SelectedIsActive = "Áno";
 			StartDate = DateTime.Now;
-			EndDate = DateTime.Now;
+			UpdateEndDateAutomatically();
 		}
 
 		public async Task RefreshData()

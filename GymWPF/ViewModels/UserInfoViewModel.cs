@@ -1,10 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using GymWPF.Models;
 using GymWPF.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using System.Windows.Input;
+using System.Windows;
+using System;
+using System.Linq;
 
 namespace GymWPF.ViewModels
 {
@@ -57,10 +58,14 @@ namespace GymWPF.ViewModels
 			set => SetProperty(ref _chipNumber, value);
 		}
 
+		/// <summary>
+		/// A collection of the user's memberships.
+		/// </summary>
 		public ObservableCollection<UserMembershipsDTO> UserMemberships { get; } = new ObservableCollection<UserMembershipsDTO>();
 
-		public ICommand DeleteUserCommand { get; }
-
+		/// <summary>
+		/// Initializes a new instance of UserInfoViewModel, attempts to load saved member info or the first available member.
+		/// </summary>
 		public UserInfoViewModel(IMemberService memberService, IMembershipService membershipService, IChipService chipService, INavigationService navigationService)
 		{
 			_memberService = memberService;
@@ -68,21 +73,47 @@ namespace GymWPF.ViewModels
 			_chipService = chipService;
 			_navigationService = navigationService;
 
-			DeleteUserCommand = new AsyncRelayCommand(OnDeleteUserAsync);
+			InitializeUserInfo();
 		}
 
-		private async Task OnDeleteUserAsync()
+		/// <summary>
+		/// Initializes user info by checking if there's a saved member ID. If not, loads the first available member.
+		/// </summary>
+		private async void InitializeUserInfo()
 		{
-			var memberID = Properties.Settings.Default.SelectedMemberId;
-			bool deleteSuccess = await _memberService.DeleteMemberAsync(memberID);
-
-			if (deleteSuccess)
+			try
 			{
-				_navigationService.CloseWindow("UserInfo");
+				int savedMemberId = Properties.Settings.Default.SelectedMemberId;
+				if (savedMemberId > 0)
+				{
+					await LoadUserInfoAsync(savedMemberId);
+				}
+				else
+				{
+					var members = await _memberService.GetAllMembersAsync();
+					if (members != null && members.Any())
+					{
+						var firstMember = members.First();
+						ClearData();
+						await LoadUserInfoAsync(firstMember.MemberID);
+						Properties.Settings.Default.SelectedMemberId = firstMember.MemberID;
+						Properties.Settings.Default.Save();
+					}
+					else
+					{
+						MessageBox.Show("Neboli nájdení žiadni používatelia.", "Informácia", MessageBoxButton.OK, MessageBoxImage.Information);
+					}
+				}
 			}
-			
+			catch (Exception ex)
+			{
+				MessageBox.Show($"Chyba pri načítaní informácií o používateľovi: {ex.Message}", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
+		/// <summary>
+		/// Loads detailed information about the specified user, including personal info, chip info, and memberships.
+		/// </summary>
 		public async Task LoadUserInfoAsync(int memberId)
 		{
 			var member = await _memberService.GetMemberByIdAsync(memberId);
@@ -98,8 +129,15 @@ namespace GymWPF.ViewModels
 
 				MembershipCount = UserMemberships.Count;
 			}
+			else
+			{
+				MessageBox.Show("Zvolený používateľ nebol nájdený.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Warning);
+			}
 		}
 
+		/// <summary>
+		/// Clears all user info fields and membership lists.
+		/// </summary>
 		public void ClearData()
 		{
 			FirstName = string.Empty;
@@ -111,11 +149,17 @@ namespace GymWPF.ViewModels
 			UserMemberships.Clear();
 		}
 
+		/// <summary>
+		/// Refreshes the currently displayed user's data.
+		/// </summary>
 		public async Task RefreshDataAsync(int memberId)
 		{
 			await LoadUserInfoAsync(memberId);
 		}
 
+		/// <summary>
+		/// Loads the user's memberships and populates the UserMemberships collection.
+		/// </summary>
 		private async Task LoadUserMembershipsAsync(int memberId)
 		{
 			var userMemberships = await _membershipService.GetUserMembershipsAsync(memberId);

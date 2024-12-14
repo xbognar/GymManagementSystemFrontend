@@ -30,15 +30,16 @@ public class NavigationService : INavigationService
 			var window = (Window)_serviceProvider.GetService(_windowRegistry[key]);
 			if (viewModel != null)
 			{
-				window.DataContext = viewModel;  // Set DataContext if a viewmodel is provided
+				window.DataContext = viewModel;
 			}
-			window?.Show();
+			window.Show();
 		}
 		else
 		{
 			throw new InvalidOperationException($"Window with key '{key}' not registered.");
 		}
 	}
+
 
 
 	// Closes the active window
