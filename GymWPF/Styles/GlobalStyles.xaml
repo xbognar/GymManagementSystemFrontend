@@ -111,7 +111,7 @@
                             <Grid Name="DropDown" 
                               SnapsToDevicePixels="True" 
                               MinWidth="{TemplateBinding ActualWidth}" 
-                              MaxHeight="200">
+                              MaxHeight="300">
                                 <Border x:Name="DropDownBorder" 
                                     Background="White" 
                                     CornerRadius="0"

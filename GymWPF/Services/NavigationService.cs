@@ -64,10 +64,14 @@ public class NavigationService : INavigationService
 	/// <param name="key">The unique key identifying the window to close.</param>
 	public void CloseWindow(string key)
 	{
-		if (_windowRegistry.ContainsKey(key))
+		foreach (var window in Application.Current.Windows.OfType<Window>())
 		{
-			var window = (Window)_serviceProvider.GetService(_windowRegistry[key]);
-			window?.Close();
+			if (window.DataContext?.GetType().Name.Contains(key, StringComparison.OrdinalIgnoreCase) == true)
+			{
+				window.Close();
+				break;
+			}
 		}
 	}
+
 }
