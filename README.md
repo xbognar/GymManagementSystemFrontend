@@ -30,19 +30,6 @@ The Gym Management System provides an efficient and organized way to manage gym 
 ### Main View
 ![Main View](https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/MainView.png)
 
-## Add Views
-
-<div align="center">
-    <img src="https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/AddMemberView.png" alt="Add Member View" width="420" height="270" style="margin: 5px;"/>
-    <img src="https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/AddMembershipView.png" alt="Add Membership View" width="400" height="300" style="margin: 5px;"/>
-</div>
-
-### User Information View
-
-<div align="center">
-    <img src="https://github.com/xbognar/GymManagementSystemFrontend/blob/master/GymWPF/Resources/Images/UserInfoView.png" alt="User Info View" width="600" height="530" style="margin: 5px;"/>
-</div>
-
 ## Architecture
 
 The Gym Management System follows the MVVM (Model-View-ViewModel) architecture pattern, which enhances maintainability and separation of concerns:
