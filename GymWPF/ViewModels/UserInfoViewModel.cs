@@ -9,6 +9,10 @@ using System.Linq;
 
 namespace GymWPF.ViewModels
 {
+	/// <summary>
+	/// ViewModel for managing and displaying detailed user information.
+	/// Includes personal details, chip information, and membership data.
+	/// </summary>
 	public class UserInfoViewModel : ObservableObject
 	{
 		private readonly IMemberService _memberService;
@@ -45,6 +49,9 @@ namespace GymWPF.ViewModels
 		}
 
 		private int _membershipCount;
+		/// <summary>
+		/// The number of memberships the user has.
+		/// </summary>
 		public int MembershipCount
 		{
 			get => _membershipCount;
@@ -58,13 +65,11 @@ namespace GymWPF.ViewModels
 			set => SetProperty(ref _chipNumber, value);
 		}
 
-		/// <summary>
-		/// A collection of the user's memberships.
-		/// </summary>
 		public ObservableCollection<UserMembershipsDTO> UserMemberships { get; } = new ObservableCollection<UserMembershipsDTO>();
 
 		/// <summary>
-		/// Initializes a new instance of UserInfoViewModel, attempts to load saved member info or the first available member.
+		/// Initializes a new instance of UserInfoViewModel.
+		/// Attempts to load saved member info or the first available member.
 		/// </summary>
 		public UserInfoViewModel(IMemberService memberService, IMembershipService membershipService, IChipService chipService, INavigationService navigationService)
 		{
@@ -77,7 +82,8 @@ namespace GymWPF.ViewModels
 		}
 
 		/// <summary>
-		/// Initializes user info by checking if there's a saved member ID. If not, loads the first available member.
+		/// Initializes user info by checking if there's a saved member ID.
+		/// If not, it loads the first available member.
 		/// </summary>
 		private async void InitializeUserInfo()
 		{
@@ -96,6 +102,7 @@ namespace GymWPF.ViewModels
 						var firstMember = members.First();
 						ClearData();
 						await LoadUserInfoAsync(firstMember.MemberID);
+
 						Properties.Settings.Default.SelectedMemberId = firstMember.MemberID;
 						Properties.Settings.Default.Save();
 					}
@@ -112,31 +119,41 @@ namespace GymWPF.ViewModels
 		}
 
 		/// <summary>
-		/// Loads detailed information about the specified user, including personal info, chip info, and memberships.
+		/// Loads detailed information about the specified user.
+		/// Includes personal details, chip info, and memberships.
 		/// </summary>
+		/// <param name="memberId">The ID of the member to load.</param>
 		public async Task LoadUserInfoAsync(int memberId)
 		{
-			var member = await _memberService.GetMemberByIdAsync(memberId);
-			if (member != null)
+			try
 			{
-				FirstName = member.FirstName;
-				LastName = member.LastName;
-				Email = member.Email;
-				PhoneNumber = member.PhoneNumber;
-				ChipNumber = await _chipService.GetChipInfoByMemberIdAsync(memberId);
+				var member = await _memberService.GetMemberByIdAsync(memberId);
+				if (member != null)
+				{
+					FirstName = member.FirstName;
+					LastName = member.LastName;
+					Email = member.Email;
+					PhoneNumber = member.PhoneNumber;
 
-				await LoadUserMembershipsAsync(memberId);
+					ChipNumber = await _chipService.GetChipInfoByMemberIdAsync(memberId);
 
-				MembershipCount = UserMemberships.Count;
+					await LoadUserMembershipsAsync(memberId);
+
+					MembershipCount = UserMemberships.Count;
+				}
+				else
+				{
+					MessageBox.Show("Zvolený používateľ nebol nájdený.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Warning);
+				}
 			}
-			else
+			catch (Exception ex)
 			{
-				MessageBox.Show("Zvolený používateľ nebol nájdený.", "Chyba", MessageBoxButton.OK, MessageBoxImage.Warning);
+				MessageBox.Show($"Chyba pri načítaní informácií o používateľovi: {ex.Message}", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
 		/// <summary>
-		/// Clears all user info fields and membership lists.
+		/// Clears all user information fields and membership data.
 		/// </summary>
 		public void ClearData()
 		{
@@ -152,24 +169,33 @@ namespace GymWPF.ViewModels
 		/// <summary>
 		/// Refreshes the currently displayed user's data.
 		/// </summary>
+		/// <param name="memberId">The ID of the member to refresh data for.</param>
 		public async Task RefreshDataAsync(int memberId)
 		{
 			await LoadUserInfoAsync(memberId);
 		}
 
 		/// <summary>
-		/// Loads the user's memberships and populates the UserMemberships collection.
+		/// Loads the memberships of a user and populates the UserMemberships collection.
 		/// </summary>
+		/// <param name="memberId">The ID of the member whose memberships to load.</param>
 		private async Task LoadUserMembershipsAsync(int memberId)
 		{
-			var userMemberships = await _membershipService.GetUserMembershipsAsync(memberId);
-			if (userMemberships != null)
+			try
 			{
-				UserMemberships.Clear();
-				foreach (var membership in userMemberships)
+				var userMemberships = await _membershipService.GetUserMembershipsAsync(memberId);
+				if (userMemberships != null)
 				{
-					UserMemberships.Add(membership);
+					UserMemberships.Clear();
+					foreach (var membership in userMemberships)
+					{
+						UserMemberships.Add(membership);
+					}
 				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($"Chyba pri načítaní členstiev: {ex.Message}", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 	}

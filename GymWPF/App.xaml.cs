@@ -10,10 +10,18 @@ using GymWPF.Views.Dialogs;
 
 namespace GymWPF
 {
+	/// <summary>
+	/// Represents the entry point of the GymWPF application.
+	/// Configures services, manages dependency injection, and handles application startup.
+	/// </summary>
 	public partial class App : Application
 	{
 		private readonly IServiceProvider _serviceProvider;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="App"/> class.
+		/// Loads environment variables and configures dependency injection.
+		/// </summary>
 		public App()
 		{
 			DotNetEnv.Env.Load();
@@ -24,6 +32,10 @@ namespace GymWPF
 			_serviceProvider = serviceCollection.BuildServiceProvider();
 		}
 
+		/// <summary>
+		/// Configures services and registers them in the dependency injection container.
+		/// </summary>
+		/// <param name="services">The service collection to configure.</param>
 		private void ConfigureServices(IServiceCollection services)
 		{
 			services.AddSingleton(new HttpClient { BaseAddress = new Uri("http://localhost") });
@@ -54,18 +66,26 @@ namespace GymWPF
 			services.AddSingleton<INavigationService, NavigationService>();
 		}
 
+		/// <summary>
+		/// Handles the startup logic for the application.
+		/// Authenticates the user and initializes the navigation service.
+		/// </summary>
+		/// <param name="e">Event arguments for the startup event.</param>
 		protected override async void OnStartup(StartupEventArgs e)
 		{
 			base.OnStartup(e);
 
+			// Retrieve username and password from environment variables
 			var username = Environment.GetEnvironmentVariable("USERNAME");
 			var password = Environment.GetEnvironmentVariable("PASSWORD");
 
+			// Authenticate the user
 			var authService = _serviceProvider.GetRequiredService<IAuthenticationService>();
 			var isAuthenticated = await authService.AuthenticateAsync(username, password);
 
 			if (!string.IsNullOrEmpty(isAuthenticated))
 			{
+				// Setup navigation service and register windows
 				var navigationService = _serviceProvider.GetRequiredService<INavigationService>();
 
 				navigationService.RegisterWindow("Main", typeof(MainView));
@@ -78,9 +98,9 @@ namespace GymWPF
 				navigationService.RegisterWindow("LargeChip", typeof(LargeChipView));
 				navigationService.RegisterWindow("AllUsers", typeof(AllUsersView));
 
-
 				navigationService.NavigateTo("Main");
 
+				// Trigger a data refresh in the main view's ViewModel
 				var mainView = Application.Current.Windows.OfType<MainView>().FirstOrDefault();
 				if (mainView?.DataContext is MainViewModel mainViewModel)
 				{

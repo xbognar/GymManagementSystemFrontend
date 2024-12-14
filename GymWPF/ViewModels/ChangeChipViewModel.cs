@@ -16,10 +16,10 @@ namespace GymWPF.ViewModels
 		private readonly IChipService _chipService;
 		private readonly INavigationService _navigationService;
 
-		/// <summary>
-		/// Contains the names of all members, used for selecting old and new chip owners.
-		/// </summary>
 		public ObservableCollection<string> MemberNames { get; } = new ObservableCollection<string>();
+
+		public ICommand CancelCommand { get; }
+		public ICommand ChangeChipCommand { get; }
 
 		private string _selectedOldOwner;
 		/// <summary>
@@ -40,16 +40,6 @@ namespace GymWPF.ViewModels
 			get => _selectedNewOwner;
 			set => SetProperty(ref _selectedNewOwner, value);
 		}
-
-		/// <summary>
-		/// Command to cancel the chip owner change and close the window.
-		/// </summary>
-		public ICommand CancelCommand { get; }
-
-		/// <summary>
-		/// Command to change the chip owner based on the selected old and new owners.
-		/// </summary>
-		public ICommand ChangeChipCommand { get; }
 
 		/// <summary>
 		/// Initializes a new instance of the ChangeChipViewModel, loads all members, and sets up commands.
@@ -132,7 +122,6 @@ namespace GymWPF.ViewModels
 
 			MessageBox.Show("Majiteľ čipu bol úspešne aktualizovaný.", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
 
-			// Clear the fields after successful update
 			ClearData();
 		}
 

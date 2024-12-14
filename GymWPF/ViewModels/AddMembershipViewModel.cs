@@ -11,17 +11,29 @@ using System.Windows.Input;
 
 namespace GymWPF.ViewModels
 {
+	/// <summary>
+	/// ViewModel for the "Add Membership" window.
+	/// Handles the creation of memberships, member selection, and related business logic.
+	/// </summary>
 	public class AddMembershipViewModel : ObservableObject
 	{
+		// Services for managing members, memberships, and navigation.
 		private readonly IMemberService _memberService;
 		private readonly IMembershipService _membershipService;
 		private readonly INavigationService _navigationService;
+
+		// Commands for creating a membership and canceling the operation.
+		public ICommand CreateMembershipCommand { get; }
+		public ICommand CancelCommand { get; }
 
 		public ObservableCollection<string> MemberNames { get; } = new ObservableCollection<string>();
 		public ObservableCollection<string> MembershipTypes { get; } = new ObservableCollection<string> { "1 mesiac", "3 mesiace", "6 mesiacov" };
 		public List<string> IsActiveOptions { get; } = new List<string> { "Áno", "Nie" };
 
 		private string _selectedMember;
+		/// <summary>
+		/// Gets or sets the selected member from the ComboBox.
+		/// </summary>
 		public string SelectedMember
 		{
 			get => _selectedMember;
@@ -29,6 +41,10 @@ namespace GymWPF.ViewModels
 		}
 
 		private string _selectedMembershipType = "1 mesiac";
+		/// <summary>
+		/// Gets or sets the selected membership type.
+		/// Updates the end date automatically when changed.
+		/// </summary>
 		public string SelectedMembershipType
 		{
 			get => _selectedMembershipType;
@@ -42,6 +58,9 @@ namespace GymWPF.ViewModels
 		}
 
 		private string _selectedIsActive = "Áno";
+		/// <summary>
+		/// Gets or sets the "IsActive" status.
+		/// </summary>
 		public string SelectedIsActive
 		{
 			get => _selectedIsActive;
@@ -49,6 +68,10 @@ namespace GymWPF.ViewModels
 		}
 
 		private DateTime _startDate = DateTime.Now;
+		/// <summary>
+		/// Gets or sets the start date of the membership.
+		/// Updates the end date automatically when changed.
+		/// </summary>
 		public DateTime StartDate
 		{
 			get => _startDate;
@@ -62,15 +85,23 @@ namespace GymWPF.ViewModels
 		}
 
 		private DateTime _endDate = DateTime.Now;
+		/// <summary>
+		/// Gets or sets the end date of the membership.
+		/// </summary>
 		public DateTime EndDate
 		{
 			get => _endDate;
 			set => SetProperty(ref _endDate, value);
 		}
 
-		public ICommand CreateMembershipCommand { get; }
-		public ICommand CancelCommand { get; }
 
+		/// <summary>
+		/// Initializes a new instance of AddMembershipViewModel.
+		/// Sets up commands and loads initial member data.
+		/// </summary>
+		/// <param name="memberService">Service for handling member data.</param>
+		/// <param name="membershipService">Service for handling membership data.</param>
+		/// <param name="navigationService">Service for handling navigation between windows.</param>
 		public AddMembershipViewModel(IMemberService memberService, IMembershipService membershipService, INavigationService navigationService)
 		{
 			_memberService = memberService;
@@ -85,6 +116,9 @@ namespace GymWPF.ViewModels
 			UpdateEndDateAutomatically();
 		}
 
+		/// <summary>
+		/// Loads all members asynchronously and populates the MemberNames collection.
+		/// </summary>
 		private async void LoadMembersAsync()
 		{
 			var members = await _memberService.GetAllMembersAsync();
@@ -97,6 +131,9 @@ namespace GymWPF.ViewModels
 			}
 		}
 
+		/// <summary>
+		/// Updates the end date automatically based on the selected membership type and start date.
+		/// </summary>
 		private void UpdateEndDateAutomatically()
 		{
 			int monthsToAdd = 1;
@@ -106,6 +143,10 @@ namespace GymWPF.ViewModels
 			EndDate = StartDate.AddMonths(monthsToAdd);
 		}
 
+		/// <summary>
+		/// Creates a new membership based on user input and adds it to the database.
+		/// Validates user input and displays appropriate messages.
+		/// </summary>
 		private async Task CreateMembershipAsync()
 		{
 			if (SelectedMember == null)
@@ -143,6 +184,9 @@ namespace GymWPF.ViewModels
 			}
 		}
 
+		/// <summary>
+		/// Clears the form data, resetting all fields to their default values.
+		/// </summary>
 		public void ClearData()
 		{
 			SelectedMember = null;
@@ -152,6 +196,9 @@ namespace GymWPF.ViewModels
 			UpdateEndDateAutomatically();
 		}
 
+		/// <summary>
+		/// Refreshes the member data in the ComboBox.
+		/// </summary>
 		public async Task RefreshData()
 		{
 			MemberNames.Clear();
@@ -165,6 +212,9 @@ namespace GymWPF.ViewModels
 			}
 		}
 
+		/// <summary>
+		/// Cancels the "Add Membership" operation and closes the window.
+		/// </summary>
 		private void Cancel()
 		{
 			_navigationService.CloseWindow("AddMembership");

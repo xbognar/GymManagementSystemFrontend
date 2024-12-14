@@ -10,6 +10,11 @@ using System.Windows.Input;
 
 namespace GymWPF.ViewModels
 {
+	
+	/// <summary>
+	/// The main ViewModel for the application, managing memberships, chips, and users.
+	/// Handles commands for navigating views, loading data, and executing user actions.
+	/// </summary>
 	public partial class MainViewModel : BaseViewModel
 	{
 		private readonly IMembershipService _membershipService;
@@ -444,6 +449,9 @@ namespace GymWPF.ViewModels
 			}
 		}
 
+		/// <summary>
+		/// Navigates to the Large Membership view.
+		/// </summary>
 		private void ShowLargeMembershipView()
 		{
 			bool isActive = IsActiveMemberships || (!IsActiveMemberships && !IsInactiveMemberships);
@@ -451,6 +459,9 @@ namespace GymWPF.ViewModels
 			_navigationService.NavigateTo("LargeMembership", vm);
 		}
 
+		/// <summary>
+		/// Navigates to the Large Chip view.
+		/// </summary>
 		private void ShowLargeChipView()
 		{
 			bool isActive = IsActiveChips || (!IsActiveChips && !IsInactiveChips);
@@ -458,6 +469,9 @@ namespace GymWPF.ViewModels
 			_navigationService.NavigateTo("LargeChip", vm);
 		}
 
+		/// <summary>
+		/// Navigates to the All Users view.
+		/// </summary>
 		private void ShowAllUsersView()
 		{
 			// Create the ViewModel manually

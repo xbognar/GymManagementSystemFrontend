@@ -8,14 +8,26 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
+/// <summary>
+/// ViewModel for displaying a large list of chips (either active or inactive).
+/// Handles loading chips and deleting them based on user actions.
+/// </summary>
 public class LargeChipViewModel : ObservableObject
 {
 	private readonly IChipService _chipService;
+
 	private bool _isActive;
 
 	public ObservableCollection<ChipDTO> Chips { get; } = new ObservableCollection<ChipDTO>();
+
 	public ICommand DeleteChipCommand { get; }
 
+	/// <summary>
+	/// Initializes a new instance of LargeChipViewModel.
+	/// Loads the chips and sets up the delete command.
+	/// </summary>
+	/// <param name="chipService">Service for managing chip data.</param>
+	/// <param name="isActive">Specifies whether to load active or inactive chips.</param>
 	public LargeChipViewModel(IChipService chipService, bool isActive)
 	{
 		_chipService = chipService;
@@ -26,11 +38,16 @@ public class LargeChipViewModel : ObservableObject
 		LoadChipsAsync();
 	}
 
+	/// <summary>
+	/// Loads chips from the backend based on their active or inactive status.
+	/// Displays an error message if the operation fails.
+	/// </summary>
 	private async Task LoadChipsAsync()
 	{
 		try
 		{
-			Chips.Clear();
+			Chips.Clear(); 
+
 			if (_isActive)
 			{
 				var activeChips = await _chipService.GetActiveChipsAsync();
@@ -56,6 +73,11 @@ public class LargeChipViewModel : ObservableObject
 		}
 	}
 
+	/// <summary>
+	/// Deletes a chip based on its ID after user confirmation.
+	/// Reloads the list of chips upon successful deletion.
+	/// </summary>
+	/// <param name="chipID">The ID of the chip to delete.</param>
 	private async Task DeleteChipAsync(object chipID)
 	{
 		if (chipID is int id)
